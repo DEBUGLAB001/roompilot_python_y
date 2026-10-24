@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoomPilot — Smart Room Booking & Scheduling Engine</title>
+  <meta name="description" content="Intelligent workplace room booking, timeline scheduling, and algorithmic resource optimization.">
+  <!-- Google Fonts for sleek typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="ambient-glow top-center"></div>
+  <div class="ambient-glow bottom-right"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <span class="brand-title">RoomPilot</span>
+          <span class="brand-tag">v2.4 Core Engine</span>
+        </div>
+      </div>
+
+      <div class="nav-status">
+        <span class="live-dot"></span>
+        <span class="status-text">Engine Online (Port 5000)</span>
+      </div>
+
+      <div class="nav-actions">
+        <button id="btn-open-booking-modal" class="btn btn-primary" aria-label="Book a Room">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Book Room</span>
+        </button>
+        <button id="btn-reset-db" class="btn btn-secondary" title="Reset Demo Data">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+          <span>Reset Demo</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <!-- Hero / Headline -->
+    <section class="hero-section">
+      <div class="hero-badge">DEBUG//LAB FLAGSHIP DSA SYSTEM</div>
+      <h1 class="hero-title">Intelligent Workplace <span class="gradient-text">Room Scheduling</span></h1>
+      <p class="hero-subtitle">Discover meeting suites, optimize multi-room capacity, inspect reservation conflicts, and orchestrate scheduling algorithms in real time.</p>
+    </section>
+
+    <!-- Stat Metric Cards -->
+    <section class="stats-grid">
+      <div class="stat-card" id="card-total-rooms">
+        <div class="stat-header">
+          <span class="stat-label">Total Rooms</span>
+          <span class="stat-icon">🏢</span>
+        </div>
+        <div class="stat-value" id="stat-total-rooms">8</div>
+        <div class="stat-meta">Active suites across 2 floors</div>
+      </div>
+
+      <div class="stat-card" id="card-avail-rooms">
+        <div class="stat-header">
+          <span class="stat-label">Available Now</span>
+          <span class="stat-icon">🟢</span>
+        </div>
+        <div class="stat-value text-teal" id="stat-avail-rooms">--</div>
+        <div class="stat-meta">Ready for immediate check-in</div>
+      </div>
+
+      <div class="stat-card" id="card-today-bookings">
+        <div class="stat-header">
+          <span class="stat-label">Today's Bookings</span>
+          <span class="stat-icon">📅</span>
+        </div>
+        <div class="stat-value text-violet" id="stat-today-bookings">--</div>
+        <div class="stat-meta">Scheduled for Oct 24, 2026</div>
+      </div>
+
+      <div class="stat-card" id="card-utilization">
+        <div class="stat-header">
+          <span class="stat-label">Room Utilization</span>
+          <span class="stat-icon">⚡</span>
+        </div>
+        <div class="stat-value text-amber" id="stat-utilization">--%</div>
+        <div class="stat-meta">Operational efficiency</div>
+      </div>
+    </section>
+
+    <!-- Navigation Pill Tabs (Taskade Aesthetic) -->
+    <nav class="pill-nav-container">
+      <div class="pill-nav">
+        <button class="pill-tab active" data-tab="floorplan" id="tab-btn-floorplan">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="9" y1="21" x2="9" y2="9"></line>
+          </svg>
+          <span>Floor Plan & Rooms</span>
+        </button>
+        <button class="pill-tab" data-tab="calendar" id="tab-btn-calendar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span>Timeline Calendar</span>
+        </button>
+        <button class="pill-tab" data-tab="queue" id="tab-btn-queue">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          <span>Priority Dispatch</span>
+        </button>
+        <button class="pill-tab" data-tab="algorithms" id="tab-btn-algorithms">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+          <span>Scheduling Insights</span>
+        </button>
+        <button class="pill-tab" data-tab="conflicts" id="tab-btn-conflicts">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>Conflict Inspector</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Tab 1: Floor Plan & Room Inventory -->
+    <section class="tab-content active" id="view-floorplan">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <h2 class="section-title">Workplace Architecture</h2>
+          <span class="section-desc">Interactive room layouts, equipment matrix, and live occupancy</span>
+        </div>
+        <div class="toolbar-right">
+          <div class="floor-toggle">
+            <button class="btn-floor active" data-floor="1" id="btn-floor-1">Floor 1 (Executive & Lab)</button>
+            <button class="btn-floor" data-floor="2" id="btn-floor-2">Floor 2 (Tech & Collab)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="floorplan-layout-wrapper">
+        <div class="floorplan-grid" id="floorplan-container">
+          <!-- Room Cards Rendered Dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 2: Timeline Calendar -->
+    <section class="tab-content" id="view-calendar">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <h2 class="section-title">Daily Booking Timeline</h2>
+          <span class="section-desc">Real-time schedule allocation across active suites</span>
+        </div>
+        <div class="toolbar-right">
+          <!-- Binary Search Predecessor Navigator -->
+          <div class="timeline-lookup-bar">
+            <span class="lookup-label">Binary Search Predecessor:</span>
+            <input type="time" id="lookup-target-time" value="11:00" class="input-time">
+            <select id="lookup-room-select" class="input-select">
+              <!-- Room options populated via JS -->
+            </select>
+            <button id="btn-run-predecessor" class="btn btn-sm btn-accent">Find Preceding Slot</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="predecessor-result-banner" class="predecessor-banner hidden">
+        <!-- Displayed result of binary search -->
+      </div>
+
+      <div class="calendar-wrapper">
+        <div class="calendar-timeline-header">
+          <div class="room-col-header">Room Suite</div>
+          <div class="hours-header">
+            <span>08:00</span><span>09:00</span><span>10:00</span><span>11:00</span>
+            <span>12:00</span><span>13:00</span><span>14:00</span><span>15:00</span>
+            <span>16:00</span><span>17:00</span><span>18:00</span>
+          </div>
+        </div>
+        <div class="calendar-grid-body" id="calendar-rows-container">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Priority Dispatch Queue -->
+    <section class="tab-content" id="view-queue">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <h2 class="section-title">Priority Booking Queue</h2>
+          <span class="section-desc">Binary heap dispatch queue for incoming meeting requests</span>
+        </div>
+        <div class="toolbar-right">
+          <button id="btn-run-pq-dispatch" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>Execute Heap Dispatch</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="queue-layout">
+        <div class="card queue-panel">
+          <div class="panel-header">
+            <h3>Pending Meeting Requests</h3>
+            <span class="badge badge-neutral" id="pending-queue-count">0 Requests</span>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Request ID</th>
+                  <th>Title & Organizer</th>
+                  <th>Requested Time</th>
+                  <th>Capacity</th>
+                  <th>Priority Score</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="queue-table-body">
+                <!-- Requests rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card queue-results-panel">
+          <div class="panel-header">
+            <h3>Heap Dispatch Sequence</h3>
+            <span class="badge badge-violet">Heap Pop Order</span>
+          </div>
+          <p class="panel-hint">Defined Policy: (1) Higher Priority Score &rarr; (2) Earlier Start Time &rarr; (3) Deterministic ID.</p>
+          <div id="pq-dispatch-results" class="dispatch-stream">
+            <div class="empty-state">Click "Execute Heap Dispatch" to process requests through the binary heap.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 4: Scheduling Insights & Algorithmic Engines -->
+    <section class="tab-content" id="view-algorithms">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <h2 class="section-title">Algorithmic Scheduling Engine</h2>
+          <span class="section-desc">Independent mathematical modules driving allocation, cardinality, and priority optimization</span>
+        </div>
+      </div>
+
+      <!-- Algorithmic Sub-tabs -->
+      <div class="algo-subtabs">
+        <button class="algo-tab-btn active" data-sub="greedy" id="subtab-greedy">Greedy Max-Bookings (EFT)</button>
+        <button class="algo-tab-btn" data-sub="weighted" id="subtab-weighted">Weighted Interval DP (Bellman)</button>
+        <button class="algo-tab-btn" data-sub="matching" id="subtab-matching">Bipartite Matching (Augmenting Paths)</button>
+      </div>
+
+      <!-- Subtab 1: Greedy Interval Scheduling -->
+      <div class="algo-subpanel active" id="subpanel-greedy">
+        <div class="algo-description-box">
+          <div class="algo-desc-content">
+            <h4>Interval Scheduling Cardinality Maximizer</h4>
+            <p>Selects the maximum number of mutually compatible reservations from candidate requests for a single high-demand conference suite using greedy selection.</p>
+          </div>
+          <button id="btn-run-greedy" class="btn btn-primary">Run Greedy Optimizer</button>
+        </div>
+
+        <div class="algo-results-grid">
+          <div class="card">
+            <div class="panel-header">
+              <h3>Candidate Meeting Requests</h3>
+              <span class="badge badge-neutral">5 Candidates</span>
+            </div>
+            <div class="candidate-list" id="greedy-candidate-list"></div>
+          </div>
+
+          <div class="card">
+            <div class="panel-header">
+              <h3>Optimized Schedule Output</h3>
+              <span class="badge badge-teal" id="greedy-metric-badge">0 Selected</span>
+            </div>
+            <div id="greedy-output-container" class="algo-output-box">
+              <div class="empty-state">Run greedy optimizer to inspect accepted and rejected intervals.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtab 2: Weighted Interval Scheduling (DP) -->
+      <div class="algo-subpanel" id="subpanel-weighted">
+        <div class="algo-description-box">
+          <div class="algo-desc-content">
+            <h4>Weighted Interval Dynamic Programming Optimizer</h4>
+            <p>Maximizes total strategic business weight: <code>OPT(j) = max(w_j + OPT(p(j)), OPT(j-1))</code> using precomputed compatibility indices.</p>
+          </div>
+          <button id="btn-run-weighted" class="btn btn-primary">Compute Optimal DP Set</button>
+        </div>
+
+        <div class="algo-results-grid">
+          <div class="card">
+            <div class="panel-header">
+              <h3>Candidate Strategic Requests</h3>
+              <span class="badge badge-neutral">4 Candidates</span>
+            </div>
+            <div class="candidate-list" id="weighted-candidate-list"></div>
+          </div>
+
+          <div class="card">
+            <div class="panel-header">
+              <h3>DP Recurrence & Selected Subset</h3>
+              <span class="badge badge-amber" id="weighted-metric-badge">Score: --</span>
+            </div>
+            <div id="weighted-output-container" class="algo-output-box">
+              <div class="empty-state">Run DP optimizer to inspect predecessor indices, recurrence values, and selected set.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtab 3: Bipartite Matching -->
+      <div class="algo-subpanel" id="subpanel-matching">
+        <div class="algo-description-box">
+          <div class="algo-desc-content">
+            <h4>Bipartite Room Allocation Graph</h4>
+            <p>Finds maximum-cardinality matching between meeting requests and suites using augmenting-path DFS traversal.</p>
+          </div>
+          <button id="btn-run-matching" class="btn btn-primary">Run Augmenting Path Matching</button>
+        </div>
+
+        <div class="algo-results-grid">
+          <div class="card">
+            <div class="panel-header">
+              <h3>Request-to-Room Compatibility Matrix</h3>
+              <span class="badge badge-neutral">3 Requests &bull; 3 Rooms</span>
+            </div>
+            <div id="matching-matrix-container" class="matrix-list"></div>
+          </div>
+
+          <div class="card">
+            <div class="panel-header">
+              <h3>Matching Allocation Results</h3>
+              <span class="badge badge-violet" id="matching-metric-badge">0 / 3 Assigned</span>
+            </div>
+            <div id="matching-output-container" class="algo-output-box">
+              <div class="empty-state">Run augmenting path matching to inspect assignments and unaccommodated requests.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 5: Conflict Inspector (Interval Tree) -->
+    <section class="tab-content" id="view-conflicts">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <h2 class="section-title">Interval Tree Conflict Inspector</h2>
+          <span class="section-desc">Augmented subtree max-end overlap query engine for instant clash detection</span>
+        </div>
+      </div>
+
+      <div class="card conflict-query-card">
+        <div class="conflict-form">
+          <div class="form-group">
+            <label for="conflict-room-select">Room Suite</label>
+            <select id="conflict-room-select" class="input-select"></select>
+          </div>
+          <div class="form-group">
+            <label for="conflict-start-time">Proposed Start Time</label>
+            <input type="time" id="conflict-start-time" value="10:00" class="input-time">
+          </div>
+          <div class="form-group">
+            <label for="conflict-end-time">Proposed End Time</label>
+            <input type="time" id="conflict-end-time" value="16:00" class="input-time">
+          </div>
+          <div class="form-group form-actions">
+            <button id="btn-query-conflicts" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <span>Query Interval Tree</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="conflict-results-container" id="conflict-results-box">
+        <div class="empty-state">Select a room and time range to query the interval tree for overlapping bookings.</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Room Details Drawer Modal -->
+  <div class="modal-backdrop hidden" id="room-modal-backdrop">
+    <div class="modal-card" id="room-modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="room-chip" id="modal-room-chip">ROOM-101</span>
+          <h3 id="modal-room-name">Suite Name</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-room-modal" aria-label="Close Modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-specs">
+          <div class="spec-pill"><span class="spec-label">Capacity:</span> <strong id="modal-room-capacity">12</strong> seats</div>
+          <div class="spec-pill"><span class="spec-label">Floor:</span> <strong id="modal-room-floor">Floor 1</strong></div>
+          <div class="spec-pill"><span class="spec-label">Status:</span> <strong id="modal-room-status">Available</strong></div>
+        </div>
+        <div class="modal-amenities-wrap">
+          <h4>Amenities & Equipment</h4>
+          <div class="tags-row" id="modal-room-amenities"></div>
+        </div>
+        <div class="modal-bookings-wrap">
+          <h4>Today's Schedule</h4>
+          <div class="schedule-timeline-mini" id="modal-room-schedule"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="btn-modal-quick-book">Book This Suite</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Reservation Modal -->
+  <div class="modal-backdrop hidden" id="booking-modal-backdrop">
+    <div class="modal-card" id="booking-modal-card">
+      <div class="modal-header">
+        <h3>Create Workplace Reservation</h3>
+        <button class="btn-close-modal" id="btn-close-booking-modal" aria-label="Close">&times;</button>
+      </div>
+      <form id="form-create-reservation">
+        <div class="modal-body form-grid">
+          <div class="form-group full-width">
+            <label for="book-title">Meeting Title *</label>
+            <input type="text" id="book-title" required placeholder="e.g. Q4 Executive Planning" class="input-text">
+          </div>
+          <div class="form-group">
+            <label for="book-organizer">Organizer *</label>
+            <input type="text" id="book-organizer" required placeholder="Your Name" class="input-text">
+          </div>
+          <div class="form-group">
+            <label for="book-room">Target Room *</label>
+            <select id="book-room" required class="input-select"></select>
+          </div>
+          <div class="form-group">
+            <label for="book-start">Start Time *</label>
+            <input type="time" id="book-start" required value="10:00" class="input-time">
+          </div>
+          <div class="form-group">
+            <label for="book-end">End Time *</label>
+            <input type="time" id="book-end" required value="11:00" class="input-time">
+          </div>
+          <div class="form-group">
+            <label for="book-priority">Priority Level</label>
+            <select id="book-priority" class="input-select">
+              <option value="5">Priority 5 (Executive / VIP)</option>
+              <option value="4">Priority 4 (High Strategic)</option>
+              <option value="3" selected>Priority 3 (Standard Sync)</option>
+              <option value="2">Priority 2 (Low / Flexible)</option>
+              <option value="1">Priority 1 (Informal)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="book-date">Date</label>
+            <input type="date" id="book-date" value="2026-10-24" class="input-text" readonly>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-booking-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-booking">Confirm Reservation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="/static/js/floorplan.js"></script>
+  <script src="/static/js/calendar.js"></script>
+  <script src="/static/js/algorithms.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

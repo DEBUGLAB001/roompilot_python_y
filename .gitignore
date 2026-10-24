@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite database files created during runtime
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+roompilot.db
+
+# Pytest cache and test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment / local configs
+.env
+venv/
+.venv/
+env/

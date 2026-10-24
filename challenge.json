@@ -1,0 +1,23 @@
+{
+  "challenge_id": "flask-challenge",
+  "runtime_config": {
+    "runtime_type": "python-flask",
+    "install_command": "pip install -r requirements.txt",
+    "start_command": "python -m flask run --reload --host 0.0.0.0 --port 5000",
+    "test_command": "pytest",
+    "ports": [
+      {
+        "container_port": 5000,
+        "type": "preview"
+      }
+    ]
+  },
+  "topics": [
+    "Binary Search, Lower Bound, and Predecessor Lookup",
+    "Priority Queues, Binary Heaps, and Comparator Invariants",
+    "Greedy Algorithms and Interval Scheduling",
+    "Dynamic Programming and Weighted Interval Scheduling",
+    "Graph Algorithms, Bipartite Matching, and Augmenting Paths",
+    "Interval Trees, Augmented Trees, and Overlap Search"
+  ]
+}
