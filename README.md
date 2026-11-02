@@ -22,7 +22,9 @@ When using the timeline calendar's lookup tool to find the scheduled booking at 
 
 **Your task:** Ensure searching for an exact meeting start time correctly returns that scheduled reservation.
 
-![BUG-01: Predecessor Search Misses Exact Start Times](docs/images/bug-01.png)
+<p align="center">
+ <img width="1262" height="954" alt="image" src="https://github.com/user-attachments/assets/37992b22-c024-4824-bf1a-74fc59b197e4" />
+</p>
 
 ---
 
@@ -39,7 +41,9 @@ When processing pending meeting requests through the dispatch queue, the applica
 
 **Your task:** Ensure higher-priority meeting requests are always dispatched before lower-priority requests, tie-breaking by earlier start time and request ID.
 
-![BUG-02: Priority Queue Dispatches Lowest Priority Requests First](docs/images/bug-02.png)
+<p align ="center">
+<img width="1262" height="954" alt="image" src="https://github.com/user-attachments/assets/4d236906-c577-42d7-996e-39f2c8b00b71" />
+</p>
 
 ---
 
@@ -56,7 +60,9 @@ The schedule optimizer selects a single all-day meeting and rejects four shorter
 
 **Your task:** Ensure the scheduler prioritizes meetings that finish earlier so that the maximum number of compatible meetings is scheduled.
 
-![BUG-03: Greedy Scheduler Selects Long Meeting Over Multiple Short Meetings](docs/images/bug-03.png)
+<p align ="center">
+<img width="1262" height="954" alt="image" src="https://github.com/user-attachments/assets/bc122758-fa4e-4486-ba60-222cbdb560b3" />
+</p>
 
 ---
 
@@ -76,7 +82,10 @@ The high-value schedule optimizer calculates a lower total score because it trea
 
 **Your task:** Ensure back-to-back meetings that touch at the same hour without overlapping minutes are recognized as compatible to achieve the highest possible schedule value.
 
-![BUG-04: Weighted Scheduling Rejects Contiguous Back-to-Back Meetings](docs/images/bug-04.png)
+<p align ="center">
+<img width="1262" height="954" alt="image" src="https://github.com/user-attachments/assets/ddf2b2c3-fd12-4e2d-9b5a-bedbaacb92d8" />
+</p>
+
 
 ---
 
@@ -96,7 +105,9 @@ The automated room assignment tool leaves eligible meeting requests unassigned e
 
 **Your task:** Ensure room tracking properly resets between meeting requests so the system can explore alternative room combinations and match all eligible requests.
 
-![BUG-05: Room Matching Fails to Assign All Eligible Requests](docs/images/bug-05.png)
+<p align ="center">
+<img width="1262" height="954" alt="image" src="https://github.com/user-attachments/assets/580c4839-8873-4a5f-8833-6c94147bb032" />
+</p>
 
 ---
 
@@ -115,7 +126,9 @@ Checking a room for scheduling conflicts over a wide time window fails to detect
 
 **Your task:** Ensure the conflict detector inspects all time ranges that overlap the requested query window.
 
-![BUG-06: Conflict Inspector Misses Overlapping Bookings](docs/images/bug-06.png)
+<p align ="center">
+<img width="1262" height="954" alt="image" src="https://github.com/user-attachments/assets/3f652478-2da6-4421-93a1-ea0b9ce14383" />
+</p>
 
 ---
 
