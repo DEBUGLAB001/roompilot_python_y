@@ -5,12 +5,17 @@
 const FloorPlan = (() => {
   let roomsData = [];
   let currentFloor = 1;
+  let searchQuery = '';
+  let minimumCapacity = 0;
+  let availableOnly = false;
+  let filtersBound = false;
 
   async function loadRooms() {
     try {
       const res = await fetch('/api/rooms');
       if (!res.ok) throw new Error('Failed to load rooms');
       roomsData = await res.json();
+      bindRoomFilters();
       renderFloorPlan();
       populateRoomDropdowns();
     } catch (err) {
@@ -31,9 +36,18 @@ const FloorPlan = (() => {
     const container = document.getElementById('floorplan-container');
     if (!container) return;
 
-    const filteredRooms = roomsData.filter(r => r.floor === currentFloor);
+    const floorRooms = roomsData.filter(r => r.floor === currentFloor);
+    const query = searchQuery.trim().toLowerCase();
+    const filteredRooms = floorRooms.filter(room => {
+      const searchable = `${room.id} ${room.name} ${room.amenities.join(' ')}`.toLowerCase();
+      return (!query || searchable.includes(query)) &&
+        room.capacity >= minimumCapacity &&
+        (!availableOnly || room.is_available_now);
+    });
+    const count = document.getElementById('room-result-count');
+    if (count) count.textContent = `${filteredRooms.length} of ${floorRooms.length} spaces`;
     if (filteredRooms.length === 0) {
-      container.innerHTML = '<div class="empty-state">No rooms found on this floor.</div>';
+      container.innerHTML = `<div class="empty-state room-empty-state"><strong>No spaces match these filters.</strong><span>Try a different search or update your capacity and availability filters.</span></div>`;
       return;
     }
 
@@ -41,19 +55,22 @@ const FloorPlan = (() => {
       const isAvail = room.is_available_now;
       const statusClass = isAvail ? 'available' : 'occupied';
       const statusText = isAvail ? 'Available Now' : 'Currently Occupied';
+      const roomImage = /board|executive|hall/i.test(room.name)
+        ? 'roompilot-boardroom.jpg'
+        : /studio|hub|lab|collab/i.test(room.name)
+          ? 'roompilot-collaboration.jpg'
+          : 'roompilot-hero.jpg';
 
       const amenitiesHtml = room.amenities.map(a => `<span class="amenity-tag">${a}</span>`).join('');
 
       return `
-        <div class="room-card" data-room-id="${room.id}" onclick="FloorPlan.openRoomModal('${room.id}')">
-          <div>
-            <div class="room-card-header">
-              <span class="room-id-tag">${room.id}</span>
-              <span class="status-pill ${statusClass}">
-                <span class="live-dot" style="${isAvail ? '' : 'background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;'}"></span>
-                ${statusText}
-              </span>
-            </div>
+        <article class="room-card" data-room-id="${room.id}" role="button" tabindex="0" aria-label="View details for ${room.name}" onclick="FloorPlan.openRoomModal('${room.id}')" onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();FloorPlan.openRoomModal('${room.id}');}">
+          <div class="room-card-visual">
+            <img src="/static/images/${roomImage}" alt="${room.name}" loading="lazy">
+            <span class="status-pill ${statusClass}"><span class="live-dot"></span>${statusText}</span>
+            <span class="room-image-id">${room.id}</span>
+          </div>
+          <div class="room-card-content">
             <h3 class="room-name">${room.name}</h3>
             <div class="room-capacity-badge">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -67,14 +84,36 @@ const FloorPlan = (() => {
             <div class="room-amenities-tags">
               ${amenitiesHtml}
             </div>
+            <div class="room-card-footer">
+              <span>${room.bookings_count} bookings scheduled</span>
+              <span class="btn btn-sm btn-secondary">View details <span aria-hidden="true">→</span></span>
+            </div>
           </div>
-          <div class="room-card-footer">
-            <span style="font-size: 0.75rem; color: var(--text-muted);">${room.bookings_count} bookings scheduled</span>
-            <span class="btn btn-sm btn-secondary">Details &rarr;</span>
-          </div>
-        </div>
+        </article>
       `;
     }).join('');
+  }
+
+  function bindRoomFilters() {
+    if (filtersBound) return;
+    filtersBound = true;
+    const search = document.getElementById('room-search-input');
+    const capacity = document.getElementById('room-capacity-filter');
+    const availability = document.getElementById('room-available-filter');
+    if (search) search.addEventListener('input', () => {
+      searchQuery = search.value;
+      renderFloorPlan();
+    });
+    if (capacity) capacity.addEventListener('change', () => {
+      minimumCapacity = parseInt(capacity.value, 10) || 0;
+      renderFloorPlan();
+    });
+    if (availability) availability.addEventListener('click', () => {
+      availableOnly = !availableOnly;
+      availability.setAttribute('aria-pressed', String(availableOnly));
+      availability.classList.toggle('active', availableOnly);
+      renderFloorPlan();
+    });
   }
 
   async function openRoomModal(roomId) {

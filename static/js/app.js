@@ -17,9 +17,10 @@ const App = (() => {
     await Promise.all([
       loadStats(),
       FloorPlan.loadRooms(),
-      Calendar.loadCalendar(),
       Algorithms.loadPendingRequests()
     ]);
+    // Calendar rows depend on the room inventory loaded above.
+    await Calendar.loadCalendar();
   }
 
   async function loadStats() {
@@ -29,7 +30,9 @@ const App = (() => {
       const stats = await res.json();
 
       document.getElementById('stat-total-rooms').textContent = stats.total_rooms;
+      document.getElementById('hero-total-room-count').textContent = stats.total_rooms;
       document.getElementById('stat-avail-rooms').textContent = stats.available_rooms;
+      document.getElementById('hero-available-count').textContent = stats.available_rooms;
       document.getElementById('stat-today-bookings').textContent = stats.today_bookings;
       document.getElementById('stat-utilization').textContent = `${stats.utilization_pct}%`;
     } catch (err) {
@@ -56,6 +59,13 @@ const App = (() => {
     const floor2Btn = document.getElementById('btn-floor-2');
     if (floor1Btn) floor1Btn.addEventListener('click', () => FloorPlan.setFloor(1));
     if (floor2Btn) floor2Btn.addEventListener('click', () => FloorPlan.setFloor(2));
+
+    document.querySelectorAll('[data-go-tab]').forEach(button => {
+      button.addEventListener('click', () => {
+        const target = document.querySelector(`.pill-tab[data-tab="${button.dataset.goTab}"]`);
+        if (target) target.click();
+      });
+    });
   }
 
   function setupModals() {
@@ -66,11 +76,11 @@ const App = (() => {
     }
 
     // Booking modal open/close
-    const openBookBtn = document.getElementById('btn-open-booking-modal');
+    const openBookBtns = document.querySelectorAll('[data-open-booking]');
     const closeBookBtn = document.getElementById('btn-close-booking-modal');
     const cancelBookBtn = document.getElementById('btn-cancel-booking-modal');
 
-    if (openBookBtn) openBookBtn.addEventListener('click', () => openBookingModal());
+    openBookBtns.forEach(button => button.addEventListener('click', () => openBookingModal()));
     if (closeBookBtn) closeBookBtn.addEventListener('click', closeBookingModal);
     if (cancelBookBtn) cancelBookBtn.addEventListener('click', closeBookingModal);
 

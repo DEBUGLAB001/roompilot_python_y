@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RoomPilot — Smart Room Booking & Scheduling Engine</title>
+  <title>RoomPilot | Room Operations</title>
   <meta name="description" content="Intelligent workplace room booking, timeline scheduling, and algorithmic resource optimization.">
   <!-- Google Fonts for sleek typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,10 +12,6 @@
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-  <!-- Ambient background glow elements -->
-  <div class="ambient-glow top-center"></div>
-  <div class="ambient-glow bottom-right"></div>
-
   <!-- Navigation Bar -->
   <header class="navbar">
     <div class="nav-container">
@@ -28,17 +24,17 @@
         </div>
         <div class="brand-info">
           <span class="brand-title">RoomPilot</span>
-          <span class="brand-tag">v2.4 Core Engine</span>
+          <span class="brand-tag">WORKSPACE MANAGEMENT</span>
         </div>
       </div>
 
       <div class="nav-status">
         <span class="live-dot"></span>
-        <span class="status-text">Engine Online (Port 5000)</span>
+        <span class="status-text">Workspace active</span>
       </div>
 
       <div class="nav-actions">
-        <button id="btn-open-booking-modal" class="btn btn-primary" aria-label="Book a Room">
+        <button id="btn-open-booking-modal" class="btn btn-primary" data-open-booking aria-label="Book a Room">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -60,9 +56,29 @@
   <main class="main-container">
     <!-- Hero / Headline -->
     <section class="hero-section">
-      <div class="hero-badge">DEBUG//LAB FLAGSHIP DSA SYSTEM</div>
-      <h1 class="hero-title">Intelligent Workplace <span class="gradient-text">Room Scheduling</span></h1>
-      <p class="hero-subtitle">Discover meeting suites, optimize multi-room capacity, inspect reservation conflicts, and orchestrate scheduling algorithms in real time.</p>
+      <div class="hero-copy">
+        <div class="hero-badge"><span class="hero-badge-dot"></span> ROOM OPERATIONS</div>
+        <h1 class="hero-title">The right room<br><span class="gradient-text">changes everything.</span></h1>
+        <p class="hero-subtitle">Bring your team together in spaces made for focused work, big ideas, and everything in between.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary hero-book-btn" data-open-booking>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            Reserve a room
+          </button>
+          <button class="hero-link-btn" data-go-tab="floorplan">Explore spaces <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="hero-proof"><span class="hero-proof-mark" aria-hidden="true">✓</span><span><strong id="hero-total-room-count">8</strong> thoughtfully equipped spaces across two floors</span></div>
+      </div>
+      <div class="hero-visual">
+        <img src="/static/images/roompilot-hero.jpg" alt="Sunlit modern meeting room with a long oak table and navy chairs" fetchpriority="high">
+        <div class="hero-image-shade"></div>
+        <div class="hero-room-card">
+          <span class="hero-room-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4m8-4v4M3 9h18"/></svg></span>
+          <div><strong>Make room for good ideas.</strong><span>Find your next favorite space</span></div>
+          <span class="hero-room-arrow" aria-hidden="true">↗</span>
+        </div>
+        <div class="hero-live-pill"><span class="live-dot"></span> <strong id="hero-available-count">4</strong> rooms ready now</div>
+      </div>
     </section>
 
     <!-- Stat Metric Cards -->
@@ -70,7 +86,7 @@
       <div class="stat-card" id="card-total-rooms">
         <div class="stat-header">
           <span class="stat-label">Total Rooms</span>
-          <span class="stat-icon">🏢</span>
+          <span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h8v18M14 9h4a2 2 0 0 1 2 2v10M8 7h2M8 11h2M8 15h2M17 13h1M17 17h1M2 21h20"/></svg></span>
         </div>
         <div class="stat-value" id="stat-total-rooms">8</div>
         <div class="stat-meta">Active suites across 2 floors</div>
@@ -79,7 +95,7 @@
       <div class="stat-card" id="card-avail-rooms">
         <div class="stat-header">
           <span class="stat-label">Available Now</span>
-          <span class="stat-icon">🟢</span>
+          <span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg></span>
         </div>
         <div class="stat-value text-teal" id="stat-avail-rooms">--</div>
         <div class="stat-meta">Ready for immediate check-in</div>
@@ -87,17 +103,17 @@
 
       <div class="stat-card" id="card-today-bookings">
         <div class="stat-header">
-          <span class="stat-label">Today's Bookings</span>
-          <span class="stat-icon">📅</span>
+          <span class="stat-label">Bookings on Demo Date</span>
+          <span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg></span>
         </div>
         <div class="stat-value text-violet" id="stat-today-bookings">--</div>
-        <div class="stat-meta">Scheduled for Oct 24, 2026</div>
+        <div class="stat-meta">Demo schedule · Oct 24, 2026</div>
       </div>
 
       <div class="stat-card" id="card-utilization">
         <div class="stat-header">
           <span class="stat-label">Room Utilization</span>
-          <span class="stat-icon">⚡</span>
+          <span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-6"/></svg></span>
         </div>
         <div class="stat-value text-amber" id="stat-utilization">--%</div>
         <div class="stat-meta">Operational efficiency</div>
@@ -158,10 +174,22 @@
     <section class="tab-content active" id="view-floorplan">
       <div class="section-toolbar">
         <div class="toolbar-left">
-          <h2 class="section-title">Workplace Architecture</h2>
-          <span class="section-desc">Interactive room layouts, equipment matrix, and live occupancy</span>
+          <h2 class="section-title">Explore spaces</h2>
+          <span class="section-desc">Browse room details, amenities, and live availability</span>
         </div>
-        <div class="toolbar-right">
+        <div class="toolbar-right room-toolbar-right">
+          <span class="room-result-count" id="room-result-count">4 spaces</span>
+          <label class="room-search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg>
+            <input type="search" id="room-search-input" placeholder="Search rooms or amenities" aria-label="Search rooms or amenities">
+          </label>
+          <select class="room-capacity-filter" id="room-capacity-filter" aria-label="Filter rooms by capacity">
+            <option value="0">Any capacity</option>
+            <option value="8">8+ seats</option>
+            <option value="12">12+ seats</option>
+            <option value="16">16+ seats</option>
+          </select>
+          <button class="availability-filter" id="room-available-filter" aria-pressed="false"><span class="filter-check" aria-hidden="true">✓</span> Available now</button>
           <div class="floor-toggle">
             <button class="btn-floor active" data-floor="1" id="btn-floor-1">Floor 1 (Executive & Lab)</button>
             <button class="btn-floor" data-floor="2" id="btn-floor-2">Floor 2 (Tech & Collab)</button>

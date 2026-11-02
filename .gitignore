@@ -20,3 +20,7 @@ htmlcov/
 venv/
 .venv/
 env/
+
+# Documentation assets and screenshots
+docs/
+docs/images/
