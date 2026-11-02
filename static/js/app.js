@@ -144,22 +144,6 @@ const App = (() => {
   }
 
   function setupActionButtons() {
-    // Reset DB
-    const resetBtn = document.getElementById('btn-reset-db');
-    if (resetBtn) {
-      resetBtn.addEventListener('click', async () => {
-        if (confirm('Reset RoomPilot database to initial demo state?')) {
-          try {
-            await fetch('/api/reset-demo-data', { method: 'POST' });
-            showToast('Database reset to initial demo seeds', 'success');
-            await refreshAll();
-          } catch (err) {
-            showToast('Failed to reset data', 'error');
-          }
-        }
-      });
-    }
-
     // Binary search predecessor button
     const predBtn = document.getElementById('btn-run-predecessor');
     if (predBtn) predBtn.addEventListener('click', Calendar.runBinarySearchPredecessor);
