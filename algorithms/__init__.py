@@ -1,8 +1,3 @@
-"""
-RoomPilot Algorithm Suite
-Independent, readable implementations of core scheduling algorithms.
-"""
-
 from .binary_search import find_predecessor_booking, lower_bound_capacity
 from .priority_queue import BookingPriorityQueue
 from .greedy_scheduling import schedule_greedy_earliest_finish
