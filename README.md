@@ -159,25 +159,6 @@ All existing room booking, calendar visualization, and operational features must
 
 ---
 
-## 4. Integrated Terminal Commands
-Your workspace provides an integrated terminal to execute the following commands:
-
-### Start the Development Server
-```bash
-python -m flask run --reload --host 0.0.0.0 --port 5000
-```
-Starts the RoomPilot application locally so you can interact with it through the Live Preview.
-
-### Run Automated Tests
-```bash
-pytest
-```
-Executes the available automated test suite to verify your implementation and identify unresolved issues.
-
-Use the Live Preview alongside the terminal to observe application behaviour and verify your changes.
-
----
-
 ## 5. Workspace Guidelines & Submission
 You have access to the complete application codebase, an interactive Live Preview, an integrated terminal, and an AI-powered coding assistant.
 
