@@ -23,7 +23,7 @@ When using the timeline calendar's lookup tool to find the scheduled booking at 
 **Your task:** Ensure searching for an exact meeting start time correctly returns that scheduled reservation.
 
 <p align="center">
- <img width="1262" height="954" alt="image" src="https://github.com/user-attachments/assets/37992b22-c024-4824-bf1a-74fc59b197e4" />
+ <img width="1262" height="954" alt="image" src="https://cdn.debuglab.online/Lab/Roompilot/uploads/bug%201.png" />
 </p>
 
 ---
@@ -42,7 +42,7 @@ When processing pending meeting requests through the dispatch queue, the applica
 **Your task:** Ensure higher-priority meeting requests are always dispatched before lower-priority requests, tie-breaking by earlier start time and request ID.
 
 <p align ="center">
-<img width="1262" height="954" alt="image" src="https://github.com/user-attachments/assets/4d236906-c577-42d7-996e-39f2c8b00b71" />
+<img width="1262" height="954" alt="image" src="https://cdn.debuglab.online/Lab/Roompilot/uploads/bug%202.png" />
 </p>
 
 ---
@@ -61,7 +61,7 @@ The schedule optimizer selects a single all-day meeting and rejects four shorter
 **Your task:** Ensure the scheduler prioritizes meetings that finish earlier so that the maximum number of compatible meetings is scheduled.
 
 <p align ="center">
-<img width="1262" height="954" alt="image" src="https://github.com/user-attachments/assets/bc122758-fa4e-4486-ba60-222cbdb560b3" />
+<img width="1262" height="954" alt="image" src="https://cdn.debuglab.online/Lab/Roompilot/uploads/bug%203.png" />
 </p>
 
 ---
@@ -83,7 +83,7 @@ The high-value schedule optimizer calculates a lower total score because it trea
 **Your task:** Ensure back-to-back meetings that touch at the same hour without overlapping minutes are recognized as compatible to achieve the highest possible schedule value.
 
 <p align ="center">
-<img width="1262" height="954" alt="image" src="https://github.com/user-attachments/assets/ddf2b2c3-fd12-4e2d-9b5a-bedbaacb92d8" />
+<img width="1262" height="954" alt="image" src="https://cdn.debuglab.online/Lab/Roompilot/uploads/bug%204.png" />
 </p>
 
 
@@ -106,7 +106,7 @@ The automated room assignment tool leaves eligible meeting requests unassigned e
 **Your task:** Ensure room tracking properly resets between meeting requests so the system can explore alternative room combinations and match all eligible requests.
 
 <p align ="center">
-<img width="1262" height="954" alt="image" src="https://github.com/user-attachments/assets/580c4839-8873-4a5f-8833-6c94147bb032" />
+<img width="1262" height="954" alt="image" src="https://cdn.debuglab.online/Lab/Roompilot/uploads/bug%205.png" />
 </p>
 
 ---
@@ -127,7 +127,7 @@ Checking a room for scheduling conflicts over a wide time window fails to detect
 **Your task:** Ensure the conflict detector inspects all time ranges that overlap the requested query window.
 
 <p align ="center">
-<img width="1262" height="954" alt="image" src="https://github.com/user-attachments/assets/3f652478-2da6-4421-93a1-ea0b9ce14383" />
+<img width="1262" height="954" alt="image" src="https://cdn.debuglab.online/Lab/Roompilot/uploads/bug%206.png" />
 </p>
 
 ---
