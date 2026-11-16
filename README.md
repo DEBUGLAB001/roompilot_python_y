@@ -13,11 +13,11 @@ When using the timeline calendar's lookup tool to find the scheduled booking at 
 
 **How to identify it:**
 1. Open the **Timeline Calendar** tab.
-2. In the lookup bar at the top right, select room **The Boardroom (ROOM-101)**.
-3. Enter the target time as **11:00** (a reservation titled *"Product Roadmap & Architecture"* is scheduled for this room from `11:00 - 12:30`).
+2. In the lookup bar at the top right, select room **Ada Lovelace Boardroom (ROOM-101)**.
+3. Enter the target time as **11:00** (a reservation titled *"Q3 Financial Audit"* is scheduled for this room from `11:00 - 12:30`).
 4. Click **Find Preceding Slot**.
 5. Notice that the result banner states:
-   > `Found slot index #0 starting at 09:00: "Q4 Executive Strategy" (09:00 - 10:30). Match Index 0`
+   > `Found slot index #0 starting at 09:00: "Executive Strategy Briefing" (09:00 - 10:30). Match Index 0`
    The search completely missed the `11:00` booking and highlighted the earlier `09:00` meeting instead. If you search for the start time of the room's very first meeting (e.g., `09:00`), it fails completely and returns `No Slot (Index -1)`.
 
 **Your task:** Ensure searching for an exact meeting start time correctly returns that scheduled reservation.
