@@ -7,7 +7,7 @@ class BookingPriorityQueue:
         p_b = b.get("priority", 0)
 
         if p_a != p_b:
-            return p_a < p_b
+            return p_a > p_b
 
         s_a = a.get("start_time", "")
         s_b = b.get("start_time", "")
@@ -39,7 +39,19 @@ class BookingPriorityQueue:
     def _sift_up(self, index):
         while index > 0:
             parent = (index - 1) // 2
-            if self._has_higher_priority(self.heap[index], self.heap[parent]):
+
+            child = self.heap[index]
+            parent_item = self.heap[parent]
+
+            child_priority = child.get("priority", 0)
+            parent_priority = parent_item.get("priority", 0)
+
+            if child_priority != parent_priority:
+                should_swap = child_priority > parent_priority
+            else:
+                should_swap = str(child.get("id", "")) < str(parent_item.get("id", ""))
+
+            if should_swap:
                 self.heap[index], self.heap[parent] = self.heap[parent], self.heap[index]
                 index = parent
             else:

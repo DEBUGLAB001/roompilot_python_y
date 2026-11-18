@@ -1,14 +1,40 @@
 /**
  * RoomPilot - Master Application Controller
+ * Enterprise Workplace Operations Platform
  */
 
 const App = (() => {
-  async function init() {
-    setupTabNavigation();
-    setupModals();
-    setupActionButtons();
+  let currentNav = 'overview';
+  let roomViewMode = 'cards';
+  let cachedStats = null;
 
-    Algorithms.initSubtabs();
+  function updateDynamicDate() {
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+    const formatted = now.toLocaleDateString('en-US', options);
+
+    const headerDateEl = document.getElementById('current-system-date');
+    if (headerDateEl) headerDateEl.textContent = formatted;
+
+    const scheduleDateEl = document.getElementById('schedule-system-date');
+    if (scheduleDateEl) scheduleDateEl.textContent = formatted;
+
+    // ISO format for date picker YYYY-MM-DD
+    const isoDate = now.toISOString().split('T')[0];
+    const bookDateInput = document.getElementById('book-date');
+    if (bookDateInput) bookDateInput.value = isoDate;
+  }
+
+  async function init() {
+    updateDynamicDate();
+    setupSidebarNavigation();
+    setupModalsAndDrawers();
+    setupGlobalActions();
+    
+    // Initialize components
+    if (typeof Algorithms !== 'undefined' && Algorithms.initSubtabs) {
+      Algorithms.initSubtabs();
+    }
 
     await refreshAll();
   }
@@ -17,79 +43,144 @@ const App = (() => {
     await Promise.all([
       loadStats(),
       FloorPlan.loadRooms(),
+      Calendar.loadCalendar(),
       Algorithms.loadPendingRequests()
     ]);
-    // Calendar rows depend on the room inventory loaded above.
-    await Calendar.loadCalendar();
+    renderOverviewDashboard();
   }
 
   async function loadStats() {
     try {
       const res = await fetch('/api/stats');
       if (!res.ok) throw new Error('Failed to load stats');
-      const stats = await res.json();
+      cachedStats = await res.json();
 
-      document.getElementById('stat-total-rooms').textContent = stats.total_rooms;
-      document.getElementById('hero-total-room-count').textContent = stats.total_rooms;
-      document.getElementById('stat-avail-rooms').textContent = stats.available_rooms;
-      document.getElementById('hero-available-count').textContent = stats.available_rooms;
-      document.getElementById('stat-today-bookings').textContent = stats.today_bookings;
-      document.getElementById('stat-utilization').textContent = `${stats.utilization_pct}%`;
+      // Overview KPI updates
+      const totalRoomsEl = document.getElementById('dash-total-rooms');
+      const availRoomsEl = document.getElementById('dash-avail-rooms');
+      const todayBookingsEl = document.getElementById('dash-today-bookings');
+      const utilEl = document.getElementById('dash-utilization');
+      const navResCountEl = document.getElementById('nav-badge-res-count');
+
+      if (totalRoomsEl) totalRoomsEl.textContent = cachedStats.total_rooms;
+      if (availRoomsEl) availRoomsEl.textContent = cachedStats.available_rooms;
+      if (todayBookingsEl) todayBookingsEl.textContent = cachedStats.today_bookings;
+      if (utilEl) utilEl.textContent = `${cachedStats.utilization_pct}%`;
+      if (navResCountEl) navResCountEl.textContent = cachedStats.today_bookings;
+
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching stats:', err);
     }
   }
 
-  function setupTabNavigation() {
-    const tabs = document.querySelectorAll('.pill-tab');
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-        tab.classList.add('active');
-        const viewId = `view-${tab.dataset.tab}`;
-        const viewEl = document.getElementById(viewId);
-        if (viewEl) viewEl.classList.add('active');
-      });
-    });
-
-    // Floor toggles
-    const floor1Btn = document.getElementById('btn-floor-1');
-    const floor2Btn = document.getElementById('btn-floor-2');
-    if (floor1Btn) floor1Btn.addEventListener('click', () => FloorPlan.setFloor(1));
-    if (floor2Btn) floor2Btn.addEventListener('click', () => FloorPlan.setFloor(2));
-
-    document.querySelectorAll('[data-go-tab]').forEach(button => {
-      button.addEventListener('click', () => {
-        const target = document.querySelector(`.pill-tab[data-tab="${button.dataset.goTab}"]`);
-        if (target) target.click();
+  function setupSidebarNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const targetView = item.dataset.nav;
+        navigateTo(targetView);
       });
     });
   }
 
-  function setupModals() {
-    // Room details modal close
-    const closeRoomModalBtn = document.getElementById('btn-close-room-modal');
-    if (closeRoomModalBtn) {
-      closeRoomModalBtn.addEventListener('click', FloorPlan.closeRoomModal);
+  function navigateTo(viewId) {
+    currentNav = viewId;
+    
+    // Update sidebar buttons
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.nav === viewId);
+    });
+
+    // Update view panels
+    document.querySelectorAll('.app-view').forEach(panel => {
+      panel.classList.toggle('active', panel.id === `view-${viewId}`);
+    });
+
+    // Trigger view-specific re-renders if necessary
+    if (viewId === 'reservations') {
+      Calendar.renderReservationsTable();
+    } else if (viewId === 'rooms') {
+      FloorPlan.renderRoomDirectory();
+    } else if (viewId === 'schedule') {
+      Calendar.renderCalendar();
+    } else if (viewId === 'overview') {
+      renderOverviewDashboard();
+    }
+  }
+
+  function renderOverviewDashboard() {
+    const reservations = Calendar.getReservations();
+    const rooms = FloorPlan.getRooms();
+    
+    // Render Today's Schedule Activity
+    const tbody = document.getElementById('dash-upcoming-table-body');
+    if (tbody) {
+      if (!reservations || reservations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No scheduled meetings for today.</td></tr>';
+      } else {
+        const sorted = [...reservations].sort((a, b) => a.start_time.localeCompare(b.start_time));
+        tbody.innerHTML = sorted.map(r => {
+          const pColor = r.priority >= 4 ? 'badge-amber' : (r.priority >= 3 ? 'badge-blue' : 'badge-neutral');
+          return `
+            <tr>
+              <td><span style="font-family:var(--font-mono); font-weight:600;">${r.start_time} - ${r.end_time}</span></td>
+              <td><strong>${r.title}</strong></td>
+              <td><span class="badge badge-neutral">${r.room_name || r.room_id}</span></td>
+              <td>${r.organizer}</td>
+              <td><span class="badge ${pColor}">P${r.priority}</span></td>
+              <td><span class="badge badge-green">Confirmed</span></td>
+            </tr>
+          `;
+        }).join('');
+      }
     }
 
+    // Render Room Availability Summary List
+    const roomList = document.getElementById('dash-room-status-list');
+    if (roomList && rooms) {
+      roomList.innerHTML = rooms.map(room => {
+        const isAvail = room.is_available_now;
+        const statusClass = isAvail ? 'available' : 'occupied';
+        const statusText = isAvail ? 'Available' : 'Occupied';
+        return `
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-light);">
+            <div>
+              <div style="font-weight:600; font-size:0.82rem;">${room.name}</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">${room.id} &bull; ${room.capacity} seats &bull; Floor ${room.floor}</div>
+            </div>
+            <span class="room-status-dot ${statusClass}">${statusText}</span>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  function setupModalsAndDrawers() {
     // Booking modal open/close
     const openBookBtns = document.querySelectorAll('[data-open-booking]');
     const closeBookBtn = document.getElementById('btn-close-booking-modal');
     const cancelBookBtn = document.getElementById('btn-cancel-booking-modal');
 
-    openBookBtns.forEach(button => button.addEventListener('click', () => openBookingModal()));
+    openBookBtns.forEach(btn => btn.addEventListener('click', () => openBookingModal()));
     if (closeBookBtn) closeBookBtn.addEventListener('click', closeBookingModal);
     if (cancelBookBtn) cancelBookBtn.addEventListener('click', closeBookingModal);
 
-    // Form submission
+    // Form submit
     const form = document.getElementById('form-create-reservation');
     if (form) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         await submitBookingForm();
+      });
+    }
+
+    // Drawer close
+    const closeDrawerBtn = document.getElementById('btn-close-drawer');
+    const drawerOverlay = document.getElementById('details-drawer-overlay');
+    if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
+    if (drawerOverlay) {
+      drawerOverlay.addEventListener('click', (e) => {
+        if (e.target === drawerOverlay) closeDrawer();
       });
     }
   }
@@ -143,30 +234,64 @@ const App = (() => {
     }
   }
 
-  function setupActionButtons() {
-    // Binary search predecessor button
-    const predBtn = document.getElementById('btn-run-predecessor');
-    if (predBtn) predBtn.addEventListener('click', Calendar.runBinarySearchPredecessor);
+  function openDrawer(title, badgeText, contentHtml, footerHtml = '') {
+    const overlay = document.getElementById('details-drawer-overlay');
+    const titleEl = document.getElementById('drawer-title');
+    const badgeEl = document.getElementById('drawer-badge');
+    const bodyEl = document.getElementById('drawer-body-content');
+    const footerEl = document.getElementById('drawer-footer-actions');
 
-    // Priority queue dispatch button
-    const pqBtn = document.getElementById('btn-run-pq-dispatch');
-    if (pqBtn) pqBtn.addEventListener('click', Algorithms.executePriorityQueueDispatch);
+    if (titleEl) titleEl.textContent = title;
+    if (badgeEl) badgeEl.textContent = badgeText;
+    if (bodyEl) bodyEl.innerHTML = contentHtml;
+    if (footerEl) footerEl.innerHTML = footerHtml;
 
-    // Greedy schedule button
-    const greedyBtn = document.getElementById('btn-run-greedy');
-    if (greedyBtn) greedyBtn.addEventListener('click', Algorithms.runGreedySchedule);
+    overlay.classList.remove('hidden');
+  }
 
-    // Weighted DP button
-    const weightedBtn = document.getElementById('btn-run-weighted');
-    if (weightedBtn) weightedBtn.addEventListener('click', Algorithms.runWeightedSchedule);
+  function closeDrawer() {
+    const overlay = document.getElementById('details-drawer-overlay');
+    if (overlay) overlay.classList.add('hidden');
+  }
 
-    // Bipartite matching button
-    const matchingBtn = document.getElementById('btn-run-matching');
-    if (matchingBtn) matchingBtn.addEventListener('click', Algorithms.runBipartiteMatching);
+  function toggleSidebar() {
+    const shell = document.querySelector('.app-shell');
+    if (shell) shell.classList.toggle('sidebar-collapsed');
+  }
 
-    // Conflict inspector button
-    const conflictBtn = document.getElementById('btn-query-conflicts');
-    if (conflictBtn) conflictBtn.addEventListener('click', Algorithms.queryIntervalConflicts);
+  function setupGlobalActions() {
+    // Sidebar toggle collapse / expand
+    const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
+    if (toggleSidebarBtn) {
+      toggleSidebarBtn.addEventListener('click', toggleSidebar);
+    }
+
+    // Schedule Jump to Slot lookup button
+    const scheduleLookupBtn = document.getElementById('btn-run-schedule-lookup');
+    if (scheduleLookupBtn) {
+      scheduleLookupBtn.addEventListener('click', Calendar.runSlotLookup);
+    }
+  }
+
+  function setRoomViewMode(mode) {
+    roomViewMode = mode;
+    const cardsWrap = document.getElementById('room-cards-container-wrap');
+    const tableWrap = document.getElementById('room-table-container-wrap');
+    const btnCards = document.getElementById('btn-view-cards');
+    const btnTable = document.getElementById('btn-view-table');
+
+    if (mode === 'cards') {
+      cardsWrap.style.display = 'block';
+      tableWrap.style.display = 'none';
+      btnCards.classList.add('active');
+      btnTable.classList.remove('active');
+    } else {
+      cardsWrap.style.display = 'none';
+      tableWrap.style.display = 'block';
+      btnCards.classList.remove('active');
+      btnTable.classList.add('active');
+    }
+    FloorPlan.renderRoomDirectory();
   }
 
   function showToast(message, type = 'info') {
@@ -190,10 +315,19 @@ const App = (() => {
   return {
     init,
     refreshAll,
+    navigateTo,
     openBookingModal,
-    showToast
+    closeBookingModal,
+    openDrawer,
+    closeDrawer,
+    setRoomViewMode,
+    showToast,
+    toggleSidebar
   };
 })();
 
-// Initialize when DOM is ready
+if (typeof window !== 'undefined') {
+  window.App = App;
+}
+
 document.addEventListener('DOMContentLoaded', App.init);

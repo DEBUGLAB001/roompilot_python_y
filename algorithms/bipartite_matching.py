@@ -28,14 +28,19 @@ def find_maximum_bipartite_matching(requests, rooms, compatibility_fn=None):
             if room_id not in visited:
                 visited.add(room_id)
                 occupant = room_match[room_id]
-                if occupant is None or dfs_augment(occupant, visited):
+                if occupant is None:
                     room_match[room_id] = req_id
                     return True
+                else:
+                    room_match[room_id] = None
+                    if dfs_augment(occupant, set()):
+                        room_match[room_id] = req_id
+                        return True
+                    room_match[room_id] = occupant
         return False
 
-    visited_rooms = set()
-
     for req in requests:
+        visited_rooms = set()
         dfs_augment(req["id"], visited_rooms)
 
     assignments = {}

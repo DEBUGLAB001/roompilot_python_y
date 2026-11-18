@@ -7,20 +7,18 @@ Your responsibility is to investigate the existing codebase, reproduce each issu
 
 ---
 
-### BUG-01: Predecessor Search Misses Exact Start Times
+### BUG-01: Predecessor Search Returns Premature Slot on Exact Match
 **Problem:**
-When using the timeline calendar's lookup tool to find the scheduled booking at an exact meeting start time, the system skips that meeting entirely and highlights an earlier time slot instead.
+When querying the timeline calendar to locate the scheduled booking preceding or matching a target time, the binary search returns the index of the first interval whose start time matches the target time rather than finding the rightmost predecessor when multiple intervals share the same timestamp, or it branches prematurely without exhausting the search space.
 
 **How to identify it:**
 1. Open the **Timeline Calendar** tab.
-2. In the lookup bar at the top right, select room **Ada Lovelace Boardroom (ROOM-101)**.
-3. Enter the target time as **11:00** (a reservation titled *"Q3 Financial Audit"* is scheduled for this room from `11:00 - 12:30`).
-4. Click **Find Preceding Slot**.
-5. Notice that the result banner states:
-   > `Found slot index #0 starting at 09:00: "Executive Strategy Briefing" (09:00 - 10:30). Match Index 0`
-   The search completely missed the `11:00` booking and highlighted the earlier `09:00` meeting instead. If you search for the start time of the room's very first meeting (e.g., `09:00`), it fails completely and returns `No Slot (Index -1)`.
+2. In the lookup controls at the top right, select suite **Ada Lovelace Boardroom (ROOM-101)**.
+3. Query the schedule for target timestamp **11:00** (where a reservation is scheduled starting at `11:00`).
+4. Execute **Find Preceding Slot**.
+5. Observe that the algorithm immediately exits upon encountering `mid_start == target_time` (`return mid`) instead of maintaining invariant bounds `low = mid + 1` to search for subsequent matching or later eligible intervals sharing the timestamp. Furthermore, verify that predecessor eligibility is determined strictly by `start_time <= target_time` regardless of `end_time`.
 
-**Your task:** Ensure searching for an exact meeting start time correctly returns that scheduled reservation.
+**Your task:** Ensure the binary search algorithm maintains the monotonic invariant to find the reservation with the greatest start time less than or equal to the target time (`start_time <= target_time`), correctly handling exact matches and tie-breakers.
 
 <p align="center">
  <img width="1262" height="954" alt="image" src="https://cdn.debuglab.online/Lab/Roompilot/uploads/bug%201.png" />
@@ -28,18 +26,18 @@ When using the timeline calendar's lookup tool to find the scheduled booking at 
 
 ---
 
-### BUG-02: Priority Queue Dispatches Lowest Priority Requests First
+### BUG-02: Priority Queue Sift-Up Ignores Start-Time Tie-Breakers
 **Problem:**
-When processing pending meeting requests through the dispatch queue, the application serves low-urgency general meetings before high-urgency executive reviews, completely inverting the priority order.
+When inserting pending reservation requests into the binary max-heap, the priority queue fails to maintain heap order consistency. While removal (`_sift_down`) applies the complete three-tier ordering contract (numerical priority, earlier start time, and lexicographical request ID), the insertion operation (`_sift_up`) skips the start-time comparator when priorities are identical.
 
 **How to identify it:**
 1. Open the **Priority Dispatch** tab.
-2. Review the **Pending Meeting Requests** table on the left. Notice requests range from **Priority 1** (routine syncs) up to **Priority 5** (urgent executive requests).
+2. Review the **Pending Meeting Requests** table, which contains multiple requests sharing identical priority tiers but differing start times and IDs (such as `REQ-10` at `09:30` and `REQ-30` at `11:00` sharing Priority 4).
 3. Click the **Execute Heap Dispatch** button.
-4. Look at the **Heap Dispatch Sequence** list on the right.
-5. Notice that Priority 1 requests appear at rank `#1` at the very top of the processed list, while urgent Priority 5 requests are placed at the bottom. The system is dispatching lowest-priority items first.
+4. Observe the dispatched sequence in the **Heap Dispatch Sequence** stream.
+5. Notice that requests with identical priority numbers are dispatched out of chronological order because `_sift_up` only compared `priority` and `id`, bypassing `start_time`.
 
-**Your task:** Ensure higher-priority meeting requests are always dispatched before lower-priority requests, tie-breaking by earlier start time and request ID.
+**Your task:** Restore consistent ordering across all heap operations by ensuring `_sift_up` uses the complete comparator `_has_higher_priority()` so that requests with equal priority are consistently ordered by earlier start time first.
 
 <p align ="center">
 <img width="1262" height="954" alt="image" src="https://cdn.debuglab.online/Lab/Roompilot/uploads/bug%202.png" />
@@ -47,18 +45,18 @@ When processing pending meeting requests through the dispatch queue, the applica
 
 ---
 
-### BUG-03: Greedy Scheduler Selects Long Meeting Over Multiple Short Meetings
+### BUG-03: Greedy Scheduler Prioritizes Earliest Start Instead of Earliest Finish
 **Problem:**
-The schedule optimizer selects a single all-day meeting and rejects four shorter compatible meetings that could have taken place throughout the day, drastically reducing the total number of meetings accommodated.
+The interval scheduling optimizer selects a single long meeting and rejects compatible shorter meetings across the day, drastically reducing total room utilization. The scheduler sorts candidates by earliest start time (`start_time`) rather than earliest finish time (`end_time`).
 
 **How to identify it:**
-1. Open the **Scheduling Insights** tab and select the **Greedy Max-Bookings (EFT)** subtab.
-2. Review the 5 candidate meeting requests listed on the left, including an all-day bootcamp (`08:30 - 17:00`) alongside four short 1 to 1.5-hour meetings.
+1. Open the **Scheduling Insights** tab and navigate to the **Greedy Max-Bookings (EFT)** workflow.
+2. Review the candidate meeting requests, including long multi-hour sessions alongside multiple short 1-hour sessions.
 3. Click **Run Greedy Optimizer**.
-4. Observe the metric badge showing `1 Selected / 4 Rejected`.
-5. Look at the output list: only the single all-day meeting (*"All-Day Architecture Bootcamp"*) is marked `SCHEDULED`, while all 4 compatible short meetings are marked `REJECTED`. The system failed to maximize the number of scheduled meetings.
+4. Observe the metric badge reporting a severely suboptimal count (such as `1 Selected / 4 Rejected`).
+5. Notice that a meeting starting early in the morning occupies the room for hours, rejecting multiple subsequent compatible meetings that could have been accommodated if the scheduler had selected the meeting that finished earliest.
 
-**Your task:** Ensure the scheduler prioritizes meetings that finish earlier so that the maximum number of compatible meetings is scheduled.
+**Your task:** Refactor the greedy scheduling strategy to sort candidates by ascending `end_time` (with deterministic tie-breakers) so that selecting meetings that free the room earliest maximizes total scheduled meetings.
 
 <p align ="center">
 <img width="1262" height="954" alt="image" src="https://cdn.debuglab.online/Lab/Roompilot/uploads/bug%203.png" />
@@ -66,21 +64,18 @@ The schedule optimizer selects a single all-day meeting and rejects four shorter
 
 ---
 
-### BUG-04: Weighted Scheduling Rejects Contiguous Back-to-Back Meetings
+### BUG-04: Weighted Interval DP Reconstruction Transitions to Wrong State
 **Problem:**
-The high-value schedule optimizer calculates a lower total score because it treats back-to-back meetings touching at the exact same hour as conflicting, preventing high-value contiguous meetings from being scheduled together.
+The high-value schedule optimizer calculates the correct optimal total weight in its dynamic programming table, but the backtracking reconstruction returns a suboptimal set of reservations whose cumulative weight is lower than the DP optimum.
 
 **How to identify it:**
 1. Open the **Scheduling Insights** tab and select the **Weighted Interval DP (Bellman)** subtab.
-2. Review the candidate strategic requests on the left:
-   - *Morning Strategy Kickoff* (`09:00 - 10:00`, Weight: 15)
-   - *Executive Investor Pitch* (`10:00 - 11:30`, Weight: 25)
-   - *Conflicting Cross-Team Sync* (`09:30 - 10:45`, Weight: 30)
-   - *Afternoon Tech Deep Dive* (`11:30 - 13:00`, Weight: 20)
+2. Review the candidate strategic requests with distinct weights and times (e.g., `REQ-01` through `REQ-05`).
 3. Click **Compute Optimal DP Set**.
-4. Notice that the badge shows `Optimal Score: 30` or `50`, failing to combine back-to-back contiguous meetings (e.g., `09:00 - 10:00` and `10:00 - 11:30`) because the system considers them to overlap.
+4. Observe the output summary: the badge reports an optimal calculated value (e.g., `Optimal Value: 75`), but the reconstructed list of selected reservations sums to a lower total (e.g., `Weight: 60`).
+5. Inspecting the reconstruction loop reveals that when a reservation is selected, the state transition indexes `curr = p[req_idx]` instead of transitioning to the DP predecessor state `curr = p[curr]`, causing the reconstruction path to skip valid optimal intervals.
 
-**Your task:** Ensure back-to-back meetings that touch at the same hour without overlapping minutes are recognized as compatible to achieve the highest possible schedule value.
+**Your task:** Correct the dynamic programming backtracking logic to properly transition to the 1-based predecessor state (`curr = p[curr]`), ensuring the reconstructed reservation schedule achieves the optimal weight computed by the DP table.
 
 <p align ="center">
 <img width="1262" height="954" alt="image" src="https://cdn.debuglab.online/Lab/Roompilot/uploads/bug%204.png" />
@@ -89,9 +84,9 @@ The high-value schedule optimizer calculates a lower total score because it trea
 
 ---
 
-### BUG-05: Room Matching Fails to Assign All Eligible Requests
+### BUG-05: Bipartite Matching Reassignment Evicts Occupants Without Alternative Rooms
 **Problem:**
-The automated room assignment tool leaves eligible meeting requests unassigned even though suitable rooms are available through schedule reassignment.
+The multi-suite automated room assignment algorithm fails to find the maximum bipartite matching. When an incoming request contends for an already assigned suite, the augmenting path traversal clears the room and initiates a reassignment search with an empty visited set, allowing the displaced request to reclaim the same room and resulting in an unnecessary eviction rather than finding a true augmenting path.
 
 **How to identify it:**
 1. Open the **Scheduling Insights** tab and select the **Bipartite Matching (Augmenting Paths)** subtab.
@@ -100,10 +95,10 @@ The automated room assignment tool leaves eligible meeting requests unassigned e
    - `M-REQ-2`: Compatible with `ROOM-101`
    - `M-REQ-3`: Compatible with `ROOM-102`, `ROOM-103`
 3. Click **Run Augmenting Path Matching**.
-4. Observe the results badge showing `2 / 3 Assigned`.
-5. Notice that `M-REQ-3 (UX Research Group)` is shown as `UNASSIGNED: No room could be assigned`, even though assigning `M-REQ-2` to `ROOM-101`, `M-REQ-1` to `ROOM-102`, and `M-REQ-3` to `ROOM-103` would successfully accommodate all 3 requests.
+4. Observe the results reporting `2 / 3 Assigned`, leaving an eligible request unassigned.
+5. Trace the execution: when `M-REQ-2` seeks `ROOM-101`, `ROOM-101` is tentatively vacated and `dfs_augment` is called on occupant `M-REQ-1` with a fresh visited set `set()`. `M-REQ-1` re-claims `ROOM-101`, and `M-REQ-2` immediately overwrites it, leaving `M-REQ-1` unassigned rather than displacing it to `ROOM-102`.
 
-**Your task:** Ensure room tracking properly resets between meeting requests so the system can explore alternative room combinations and match all eligible requests.
+**Your task:** Fix the augmenting path reassignment logic so that the search context correctly prevents occupants from reclaiming contended resources, ensuring true augmenting paths complete and achieve maximum matching.
 
 <p align ="center">
 <img width="1262" height="954" alt="image" src="https://cdn.debuglab.online/Lab/Roompilot/uploads/bug%205.png" />
@@ -111,20 +106,18 @@ The automated room assignment tool leaves eligible meeting requests unassigned e
 
 ---
 
-### BUG-06: Conflict Inspector Misses Overlapping Bookings
+### BUG-06: Interval Tree Subtree Max-End Clobbered During Insertion
 **Problem:**
-Checking a room for scheduling conflicts over a wide time window fails to detect earlier overlapping reservations, giving users false confidence that a room is free.
+The interval conflict inspector misses overlapping reservations during broad time-window queries. Although the search pruning condition is correctly defined, the tree insertion algorithm fails to maintain the correct augmented subtree metadata (`max_end`), causing legitimate overlapping subtrees to be pruned.
 
 **How to identify it:**
 1. Open the **Conflict Inspector** tab.
-2. Select room **The Boardroom (ROOM-101)**.
-3. Set Proposed Start Time to **10:00** and Proposed End Time to **16:00**.
+2. Select suite **Ada Lovelace Boardroom (ROOM-101)** or test with an augmented tree containing deep descendants whose end times exceed their ancestors.
+3. Query for an inspection window that overlaps a deep descendant (e.g., query window `12:00 - 13:00` against a descendant reservation `10:00 - 13:30`).
 4. Click **Query Interval Tree**.
-5. Observe the Conflict Detected panel:
-   - The system reports: `⚠️ Conflict Detected (1 Overlap)` and only lists the reservation from `14:00 - 15:30`.
-   - It completely misses the existing reservation scheduled from `11:00 - 12:30` (*"Product Roadmap & Architecture"*), even though `11:00 - 12:30` falls directly inside the requested `10:00 - 16:00` window.
+5. Observe that the search reports no conflict detected. During tree insertion, when a node receives children on both left and right subtrees, updating `max_end` only on the branch of the latest insertion overwrites the larger end time from the opposing subtree, leaving an ancestor with an artificially low `max_end` that triggers false pruning.
 
-**Your task:** Ensure the conflict detector inspects all time ranges that overlap the requested query window.
+**Your task:** Ensure `_insert_node` updates `current.max_end` to the true maximum across the node's own end time and both left and right subtrees (`max(current.end, left.max_end, right.max_end)`).
 
 <p align ="center">
 <img width="1262" height="954" alt="image" src="https://cdn.debuglab.online/Lab/Roompilot/uploads/bug%206.png" />
@@ -148,12 +141,12 @@ RoomPilot is an intelligent workplace room booking and scheduling platform that 
 ## 3. Expected Behaviour After Fixing the Bugs
 Once all reported issues have been resolved, the application should behave as follows:
 
-- **Predecessor Lookup:** Searching for an exact meeting start time on the calendar correctly returns that reservation as the predecessor slot (`Index #1`).
-- **Priority Dispatch:** The binary heap dispatch queue processes Priority 5 urgent requests before Priority 1 general requests.
-- **Greedy Optimization:** The greedy scheduler selects multiple compatible meetings across the day instead of a single all-day meeting.
-- **Weighted Scheduling:** The high-value schedule optimizer recognizes contiguous back-to-back meetings as compatible, calculating the optimal strategic score.
-- **Automated Room Matching:** Room reassignment works properly across requests, successfully assigning all three eligible requests to suitable rooms (`3 / 3 Assigned`).
-- **Conflict Detection:** The interval tree conflict detector detects all reservations overlapping the specified inspection window (both `11:00 - 12:30` and `14:00 - 15:30`).
+- **Predecessor Lookup:** Searching for a target meeting time returns the reservation with the greatest start time less than or equal to the target time (`start_time <= target_time`), correctly identifying exact matches and ties.
+- **Priority Dispatch:** The binary heap dispatch queue strictly enforces priority ordering: highest priority first (5 down to 1), breaking ties by earlier start time, and then lexicographical request ID.
+- **Greedy Optimization:** The greedy scheduler applies earliest finish time (EFT) ordering, accommodating the maximum number of compatible meetings across the day instead of a single long meeting.
+- **Weighted Scheduling:** The dynamic programming reconstruction accurately backtracks through 1-based predecessor states (`curr = p[curr]`), producing a selected reservation schedule that matches the optimal DP score.
+- **Automated Room Matching:** Augmenting path reassignments explore alternative compatible rooms without clobbering existing bookings, achieving the true maximum bipartite matching (e.g., `3 / 3 Assigned`).
+- **Conflict Detection:** The interval tree correctly propagates subtree `max_end` metadata across both child subtrees during insertion, ensuring overlap queries never prune subtrees containing valid conflicting reservations.
 
 All existing room booking, calendar visualization, and operational features must continue working as expected.
 

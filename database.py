@@ -102,16 +102,16 @@ def seed_data(conn):
         ("RES-108", "ROOM-103", "UX Usability Lab Sessions", "Rachel Green", today, "14:00", "16:00", 4, "confirmed"),
         ("RES-109", "ROOM-201", "All-Hands Product Launch", "Alex Rivera", today, "10:00", "12:00", 5, "confirmed"),
         ("RES-110", "ROOM-202", "Data Pipeline Retrospective", "Karan Mehta", today, "13:00", "14:30", 3, "confirmed"),
+        ("RES-201", "ROOM-203", "Research Methodology Sync", "Dr. Aris Thorne", today, "09:00", "10:00", 4, "confirmed"),
+        ("RES-202", "ROOM-203", "Data Modeling Workshop (Part 1)", "Devin Cole", today, "11:00", "12:00", 4, "confirmed"),
+        ("RES-203", "ROOM-203", "Data Modeling Workshop (Part 2)", "Marcus Vance", today, "11:00", "12:30", 5, "confirmed"),
+        ("RES-204", "ROOM-203", "Algorithm Verification Lab", "Elena Rostova", today, "14:00", "15:30", 4, "confirmed"),
     ]
     conn.executemany("INSERT INTO reservations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", reservations)
 
     requests = [
-        # Candidate pool for priority queue and matching demonstrations
-        ("REQ-01", "VIP Executive Partnership", "Elena Rostova", today, "09:00", "10:00", 14, "Video Conf", 5, "pending", None),
-        ("REQ-02", "Product Roadmap Alignment", "Alex Rivera", today, "10:00", "11:30", 10, "Whiteboard", 4, "pending", None),
-        ("REQ-03", "Infrastructure Sprint Triage", "Marcus Vance", today, "11:30", "12:30", 6, "Dual Monitors", 3, "pending", None),
-        ("REQ-04", "Customer Escalation Debrief", "Sarah Chen", today, "13:00", "14:00", 8, "Video Conf", 4, "pending", None),
-        ("REQ-05", "Casual Team Coffee Sync", "Liam O'Connor", today, "09:00", "09:45", 4, "None", 1, "pending", None),
-        ("REQ-06", "Security Pen-test Retrospective", "Devin Cole", today, "14:30", "16:00", 12, "Soundproofing", 5, "pending", None),
+        ("REQ-10", "Afternoon Client Review", "Marcus Vance", today, "13:00", "14:30", 6, "Video Conf", 4, "pending", None),
+        ("REQ-30", "Infrastructure Planning", "Devin Cole", today, "10:00", "11:30", 8, "Whiteboard", 3, "pending", None),
+        ("REQ-20", "Morning Compliance Review", "Elena Rostova", today, "09:00", "10:30", 10, "Dual Monitors", 4, "pending", None),
     ]
     conn.executemany("INSERT INTO meeting_requests VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", requests)

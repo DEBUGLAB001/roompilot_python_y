@@ -8,7 +8,7 @@ def _compute_predecessor_index(sorted_requests, j):
         mid = (low + high) // 2
         mid_end = sorted_requests[mid].get("end_time", "")
 
-        if mid_end < target_start:
+        if mid_end <= target_start:
             best_idx = mid + 1
             low = mid + 1
         else:
@@ -43,10 +43,11 @@ def solve_weighted_interval_scheduling(candidate_requests):
     selected = []
     curr = n
     while curr > 0:
-        weight_curr = int(sorted_reqs[curr - 1].get("weight", sorted_reqs[curr - 1].get("priority", 1)))
+        req_idx = curr - 1
+        weight_curr = int(sorted_reqs[req_idx].get("weight", sorted_reqs[req_idx].get("priority", 1)))
         if weight_curr + dp[p[curr]] >= dp[curr - 1]:
-            selected.append(sorted_reqs[curr - 1])
-            curr = p[curr]
+            selected.append(sorted_reqs[req_idx])
+            curr = p[req_idx]
         else:
             curr = curr - 1
 

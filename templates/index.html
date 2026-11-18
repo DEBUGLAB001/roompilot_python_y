@@ -1,520 +1,882 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RoomPilot | Room Operations</title>
-  <meta name="description" content="Intelligent workplace room booking, timeline scheduling, and algorithmic resource optimization.">
-  <!-- Google Fonts for sleek typography -->
+  <title>RoomPilot — Enterprise Workplace Operations</title>
+  <meta name="description" content="Enterprise room management, scheduling optimization, and workplace operations.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
+
 <body>
-  <!-- Navigation Bar -->
-  <header class="navbar">
-    <div class="nav-container">
-      <div class="brand">
-        <div class="brand-badge">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-          </svg>
-        </div>
-        <div class="brand-info">
-          <span class="brand-title">RoomPilot</span>
-          <span class="brand-tag">WORKSPACE MANAGEMENT</span>
+  <div class="app-shell">
+    <!-- Persistent Enterprise Sidebar -->
+    <aside class="app-sidebar" aria-label="Main Navigation">
+      <div class="sidebar-header">
+        <div class="brand-badge-row">
+          <div class="brand-icon-box" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </div>
+          <div class="brand-text-col">
+            <span class="brand-name">RoomPilot</span>
+            <span class="brand-subtitle">Workplace Ops</span>
+          </div>
         </div>
       </div>
 
-      <div class="nav-status">
-        <span class="live-dot"></span>
-        <span class="status-text">Workspace active</span>
-      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Operations</div>
 
-      <div class="nav-actions">
-        <button id="btn-open-booking-modal" class="btn btn-primary" data-open-booking aria-label="Book a Room">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
+        <button class="nav-item active" data-nav="overview" id="nav-btn-overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+            <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+            <rect x="3" y="16" width="7" height="5" rx="1"></rect>
           </svg>
-          <span>Book Room</span>
+          <span>Overview</span>
         </button>
-      </div>
-    </div>
-  </header>
 
-  <!-- Main Container -->
-  <main class="main-container">
-    <!-- Hero / Headline -->
-    <section class="hero-section">
-      <div class="hero-copy">
-        <div class="hero-badge"><span class="hero-badge-dot"></span> ROOM OPERATIONS</div>
-        <h1 class="hero-title">The right room<br><span class="gradient-text">changes everything.</span></h1>
-        <p class="hero-subtitle">Bring your team together in spaces made for focused work, big ideas, and everything in between.</p>
-        <div class="hero-actions">
-          <button class="btn btn-primary hero-book-btn" data-open-booking>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            Reserve a room
-          </button>
-          <button class="hero-link-btn" data-go-tab="floorplan">Explore spaces <span aria-hidden="true">→</span></button>
-        </div>
-        <div class="hero-proof"><span class="hero-proof-mark" aria-hidden="true">✓</span><span><strong id="hero-total-room-count">8</strong> thoughtfully equipped spaces across two floors</span></div>
-      </div>
-      <div class="hero-visual">
-        <img src="/static/images/roompilot-hero.jpg" alt="Sunlit modern meeting room with a long oak table and navy chairs" fetchpriority="high">
-        <div class="hero-image-shade"></div>
-        <div class="hero-room-card">
-          <span class="hero-room-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4m8-4v4M3 9h18"/></svg></span>
-          <div><strong>Make room for good ideas.</strong><span>Find your next favorite space</span></div>
-          <span class="hero-room-arrow" aria-hidden="true">↗</span>
-        </div>
-        <div class="hero-live-pill"><span class="live-dot"></span> <strong id="hero-available-count">4</strong> rooms ready now</div>
-      </div>
-    </section>
-
-    <!-- Stat Metric Cards -->
-    <section class="stats-grid">
-      <div class="stat-card" id="card-total-rooms">
-        <div class="stat-header">
-          <span class="stat-label">Total Rooms</span>
-          <span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h8v18M14 9h4a2 2 0 0 1 2 2v10M8 7h2M8 11h2M8 15h2M17 13h1M17 17h1M2 21h20"/></svg></span>
-        </div>
-        <div class="stat-value" id="stat-total-rooms">8</div>
-        <div class="stat-meta">Active suites across 2 floors</div>
-      </div>
-
-      <div class="stat-card" id="card-avail-rooms">
-        <div class="stat-header">
-          <span class="stat-label">Available Now</span>
-          <span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg></span>
-        </div>
-        <div class="stat-value text-teal" id="stat-avail-rooms">--</div>
-        <div class="stat-meta">Ready for immediate check-in</div>
-      </div>
-
-      <div class="stat-card" id="card-today-bookings">
-        <div class="stat-header">
-          <span class="stat-label">Bookings on Demo Date</span>
-          <span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg></span>
-        </div>
-        <div class="stat-value text-violet" id="stat-today-bookings">--</div>
-        <div class="stat-meta">Demo schedule · Oct 24, 2026</div>
-      </div>
-
-      <div class="stat-card" id="card-utilization">
-        <div class="stat-header">
-          <span class="stat-label">Room Utilization</span>
-          <span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h17M8 15l4-4 3 2 5-6"/></svg></span>
-        </div>
-        <div class="stat-value text-amber" id="stat-utilization">--%</div>
-        <div class="stat-meta">Operational efficiency</div>
-      </div>
-    </section>
-
-    <!-- Navigation Pill Tabs (Taskade Aesthetic) -->
-    <nav class="pill-nav-container">
-      <div class="pill-nav">
-        <button class="pill-tab active" data-tab="floorplan" id="tab-btn-floorplan">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="3" y1="9" x2="21" y2="9"></line>
-            <line x1="9" y1="21" x2="9" y2="9"></line>
-          </svg>
-          <span>Floor Plan & Rooms</span>
-        </button>
-        <button class="pill-tab" data-tab="calendar" id="tab-btn-calendar">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button class="nav-item" data-nav="reservations" id="nav-btn-reservations">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>
             <line x1="8" y1="2" x2="8" y2="6"></line>
             <line x1="3" y1="10" x2="21" y2="10"></line>
           </svg>
-          <span>Timeline Calendar</span>
+          <span>Reservations</span>
+          <span class="nav-item-badge" id="nav-badge-res-count">--</span>
         </button>
-        <button class="pill-tab" data-tab="queue" id="tab-btn-queue">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="8" y1="6" x2="21" y2="6"></line>
-            <line x1="8" y1="12" x2="21" y2="12"></line>
-            <line x1="8" y1="18" x2="21" y2="18"></line>
-            <line x1="3" y1="6" x2="3.01" y2="6"></line>
-            <line x1="3" y1="12" x2="3.01" y2="12"></line>
-            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+
+        <button class="nav-item" data-nav="rooms" id="nav-btn-rooms">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M3 21h18"></path>
+            <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path>
+            <path d="M9 9h1"></path>
+            <path d="M9 13h1"></path>
+            <path d="M9 17h1"></path>
+            <path d="M14 9h1"></path>
+            <path d="M14 13h1"></path>
+            <path d="M14 17h1"></path>
           </svg>
-          <span>Priority Dispatch</span>
+          <span>Room Directory</span>
         </button>
-        <button class="pill-tab" data-tab="algorithms" id="tab-btn-algorithms">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-            <polyline points="2 17 12 22 22 17"></polyline>
-            <polyline points="2 12 12 17 22 12"></polyline>
-          </svg>
-          <span>Scheduling Insights</span>
-        </button>
-        <button class="pill-tab" data-tab="conflicts" id="tab-btn-conflicts">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+        <button class="nav-item" data-nav="schedule" id="nav-btn-schedule">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
-          <span>Conflict Inspector</span>
+          <span>Schedule</span>
         </button>
-      </div>
-    </nav>
 
-    <!-- Tab 1: Floor Plan & Room Inventory -->
-    <section class="tab-content active" id="view-floorplan">
-      <div class="section-toolbar">
-        <div class="toolbar-left">
-          <h2 class="section-title">Explore spaces</h2>
-          <span class="section-desc">Browse room details, amenities, and live availability</span>
-        </div>
-        <div class="toolbar-right room-toolbar-right">
-          <span class="room-result-count" id="room-result-count">4 spaces</span>
-          <label class="room-search">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg>
-            <input type="search" id="room-search-input" placeholder="Search rooms or amenities" aria-label="Search rooms or amenities">
-          </label>
-          <select class="room-capacity-filter" id="room-capacity-filter" aria-label="Filter rooms by capacity">
-            <option value="0">Any capacity</option>
-            <option value="8">8+ seats</option>
-            <option value="12">12+ seats</option>
-            <option value="16">16+ seats</option>
-          </select>
-          <button class="availability-filter" id="room-available-filter" aria-pressed="false"><span class="filter-check" aria-hidden="true">✓</span> Available now</button>
-          <div class="floor-toggle">
-            <button class="btn-floor active" data-floor="1" id="btn-floor-1">Floor 1 (Executive & Lab)</button>
-            <button class="btn-floor" data-floor="2" id="btn-floor-2">Floor 2 (Tech & Collab)</button>
+        <div class="nav-section-label">Management</div>
+
+        <button class="nav-item" data-nav="allocation" id="nav-btn-allocation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <polyline points="16 11 18 13 22 9"></polyline>
+          </svg>
+          <span>Resource Allocation</span>
+          <span class="nav-item-badge" id="nav-badge-alloc-count">6</span>
+        </button>
+
+        <button class="nav-item" data-nav="operations" id="nav-btn-operations">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span>Operations & Audit</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="workspace-badge">
+          <div class="workspace-avatar">RP</div>
+          <div class="workspace-info">
+            <span class="workspace-title">HQ San Francisco</span>
+            <span class="workspace-sub">Production Zone 1</span>
           </div>
         </div>
       </div>
+    </aside>
 
-      <div class="floorplan-layout-wrapper">
-        <div class="floorplan-grid" id="floorplan-container">
-          <!-- Room Cards Rendered Dynamically -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Tab 2: Timeline Calendar -->
-    <section class="tab-content" id="view-calendar">
-      <div class="section-toolbar">
-        <div class="toolbar-left">
-          <h2 class="section-title">Daily Booking Timeline</h2>
-          <span class="section-desc">Real-time schedule allocation across active suites</span>
-        </div>
-        <div class="toolbar-right">
-          <!-- Binary Search Predecessor Navigator -->
-          <div class="timeline-lookup-bar">
-            <span class="lookup-label">Binary Search Predecessor:</span>
-            <input type="time" id="lookup-target-time" value="11:00" class="input-time">
-            <select id="lookup-room-select" class="input-select">
-              <!-- Room options populated via JS -->
-            </select>
-            <button id="btn-run-predecessor" class="btn btn-sm btn-accent">Find Preceding Slot</button>
-          </div>
-        </div>
-      </div>
-
-      <div id="predecessor-result-banner" class="predecessor-banner hidden">
-        <!-- Displayed result of binary search -->
-      </div>
-
-      <div class="calendar-wrapper">
-        <div class="calendar-timeline-header">
-          <div class="room-col-header">Room Suite</div>
-          <div class="hours-header">
-            <span>08:00</span><span>09:00</span><span>10:00</span><span>11:00</span>
-            <span>12:00</span><span>13:00</span><span>14:00</span><span>15:00</span>
-            <span>16:00</span><span>17:00</span><span>18:00</span>
-          </div>
-        </div>
-        <div class="calendar-grid-body" id="calendar-rows-container">
-          <!-- Rendered dynamically -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Tab 3: Priority Dispatch Queue -->
-    <section class="tab-content" id="view-queue">
-      <div class="section-toolbar">
-        <div class="toolbar-left">
-          <h2 class="section-title">Priority Booking Queue</h2>
-          <span class="section-desc">Binary heap dispatch queue for incoming meeting requests</span>
-        </div>
-        <div class="toolbar-right">
-          <button id="btn-run-pq-dispatch" class="btn btn-primary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+    <!-- Main Content Shell -->
+    <main class="app-main">
+      <!-- Universal Header -->
+      <header class="app-header">
+        <div class="header-left">
+          <button id="btn-toggle-sidebar" class="btn-icon" aria-label="Toggle navigation menu"
+            title="Collapse / Expand Sidebar" onclick="App.toggleSidebar()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
-            <span>Execute Heap Dispatch</span>
+          </button>
+          <div class="header-date-badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span id="current-system-date">Today</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button id="btn-global-book" class="btn btn-primary" data-open-booking>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Book a Room</span>
           </button>
         </div>
-      </div>
+      </header>
 
-      <div class="queue-layout">
-        <div class="card queue-panel">
-          <div class="panel-header">
-            <h3>Pending Meeting Requests</h3>
-            <span class="badge badge-neutral" id="pending-queue-count">0 Requests</span>
+      <!-- Scrollable View Container -->
+      <div class="page-container">
+
+        <!-- ========================================================================= -->
+        <!-- VIEW 1: OVERVIEW DASHBOARD -->
+        <!-- ========================================================================= -->
+        <section class="app-view active" id="view-overview">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Operations Overview</h1>
+              <p>Real-time capacity, occupancy status, and active reservations across all suites</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-secondary btn-sm" onclick="App.refreshAll()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                </svg>
+                <span>Refresh Data</span>
+              </button>
+            </div>
           </div>
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Request ID</th>
-                  <th>Title & Organizer</th>
-                  <th>Requested Time</th>
-                  <th>Capacity</th>
-                  <th>Priority Score</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="queue-table-body">
-                <!-- Requests rows -->
-              </tbody>
-            </table>
+
+          <!-- KPI Cards -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Total Rooms</span>
+                <div class="kpi-icon-wrap blue">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="dash-total-rooms">--</div>
+              <div class="kpi-footer">Across 2 managed floors</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Available Now</span>
+                <div class="kpi-icon-wrap green">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 14 14"></polyline>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="dash-avail-rooms" style="color:var(--success);">--</div>
+              <div class="kpi-footer">Ready for immediate check-in</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Today's Reservations</span>
+                <div class="kpi-icon-wrap purple">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="dash-today-bookings">--</div>
+              <div class="kpi-footer">Confirmed meetings today</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-title">Space Utilization</span>
+                <div class="kpi-icon-wrap amber">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M18 20V10M12 20V4M6 20v-6"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="kpi-value" id="dash-utilization">--%</div>
+              <div class="kpi-footer">Operating capacity index</div>
+            </div>
           </div>
-        </div>
 
-        <div class="card queue-results-panel">
-          <div class="panel-header">
-            <h3>Heap Dispatch Sequence</h3>
-            <span class="badge badge-violet">Heap Pop Order</span>
+          <!-- Main Dashboard Split Grid -->
+          <div class="split-grid-2">
+            <!-- Left: Today's Schedule Overview -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-header-left">
+                  <h2 class="card-title">Today's Schedule Activity</h2>
+                  <span class="card-subtitle">Real-time status across meeting rooms</span>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="App.navigateTo('schedule')">
+                  <span>View Timeline</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Meeting</th>
+                      <th>Room</th>
+                      <th>Organizer</th>
+                      <th>Priority</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dash-upcoming-table-body">
+                    <tr>
+                      <td colspan="6" class="empty-state">Loading reservations...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Right: Room Availability Summary & Operational Alerts -->
+            <div style="display:flex; flex-direction:column; gap:20px;">
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="card-title">Room Availability Summary</h2>
+                  <button class="btn btn-secondary btn-sm" onclick="App.navigateTo('rooms')">All Rooms</button>
+                </div>
+                <div class="card-body" style="padding:12px 16px;" id="dash-room-status-list">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="card-title">Pending Resource Requests</h2>
+                  <span class="badge badge-amber" id="dash-pending-badge">0 Pending</span>
+                </div>
+                <div class="card-body" style="padding:16px;">
+                  <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Unfulfilled meeting requests
+                    waiting for priority assignment or room matching.</p>
+                  <button class="btn btn-secondary btn-sm" style="width:100%; justify-content:center;"
+                    onclick="App.navigateTo('allocation')">
+                    Open Allocation Management
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-          <p class="panel-hint">Defined Policy: (1) Higher Priority Score &rarr; (2) Earlier Start Time &rarr; (3) Deterministic ID.</p>
-          <div id="pq-dispatch-results" class="dispatch-stream">
-            <div class="empty-state">Click "Execute Heap Dispatch" to process requests through the binary heap.</div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- VIEW 2: RESERVATIONS MANAGEMENT -->
+        <!-- ========================================================================= -->
+        <section class="app-view" id="view-reservations">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Reservation Management</h1>
+              <p>Manage, inspect, filter, and cancel workplace reservations across all suites</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-primary" data-open-booking>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>New Reservation</span>
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- Tab 4: Scheduling Insights & Algorithmic Engines -->
-    <section class="tab-content" id="view-algorithms">
-      <div class="section-toolbar">
-        <div class="toolbar-left">
-          <h2 class="section-title">Algorithmic Scheduling Engine</h2>
-          <span class="section-desc">Independent mathematical modules driving allocation, cardinality, and priority optimization</span>
-        </div>
-      </div>
-
-      <!-- Algorithmic Sub-tabs -->
-      <div class="algo-subtabs">
-        <button class="algo-tab-btn active" data-sub="greedy" id="subtab-greedy">Greedy Max-Bookings (EFT)</button>
-        <button class="algo-tab-btn" data-sub="weighted" id="subtab-weighted">Weighted Interval DP (Bellman)</button>
-        <button class="algo-tab-btn" data-sub="matching" id="subtab-matching">Bipartite Matching (Augmenting Paths)</button>
-      </div>
-
-      <!-- Subtab 1: Greedy Interval Scheduling -->
-      <div class="algo-subpanel active" id="subpanel-greedy">
-        <div class="algo-description-box">
-          <div class="algo-desc-content">
-            <h4>Interval Scheduling Cardinality Maximizer</h4>
-            <p>Selects the maximum number of mutually compatible reservations from candidate requests for a single high-demand conference suite using greedy selection.</p>
-          </div>
-          <button id="btn-run-greedy" class="btn btn-primary">Run Greedy Optimizer</button>
-        </div>
-
-        <div class="algo-results-grid">
           <div class="card">
-            <div class="panel-header">
-              <h3>Candidate Meeting Requests</h3>
-              <span class="badge badge-neutral">5 Candidates</span>
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+              <div class="search-input-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="res-search-input" class="form-input"
+                  placeholder="Search by title, organizer, or ID...">
+              </div>
+
+              <div style="min-width: 180px;">
+                <select id="res-room-filter" class="form-select">
+                  <option value="">All Meeting Rooms</option>
+                </select>
+              </div>
+
+              <div style="min-width: 140px;">
+                <select id="res-priority-filter" class="form-select">
+                  <option value="">All Priorities</option>
+                  <option value="5">Priority 5 (Executive)</option>
+                  <option value="4">Priority 4 (High)</option>
+                  <option value="3">Priority 3 (Standard)</option>
+                  <option value="2">Priority 2 (Flexible)</option>
+                  <option value="1">Priority 1 (Informal)</option>
+                </select>
+              </div>
+
+              <div style="font-size:0.8rem; color:var(--text-muted); margin-left:auto;" id="res-count-display">
+                Showing all reservations
+              </div>
             </div>
-            <div class="candidate-list" id="greedy-candidate-list"></div>
+
+            <!-- Data Table -->
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Meeting Title</th>
+                    <th>Organizer</th>
+                    <th>Room</th>
+                    <th>Date</th>
+                    <th>Time Window</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="res-table-body">
+                  <tr>
+                    <td colspan="9" class="empty-state">Loading reservations...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- VIEW 3: ROOM DIRECTORY -->
+        <!-- ========================================================================= -->
+        <section class="app-view" id="view-rooms">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Room Directory</h1>
+              <p>Inventory, capacity, floor specifications, and amenities for all workspaces</p>
+            </div>
+            <div class="view-header-actions">
+              <div class="btn-group"
+                style="display:flex; border:1px solid var(--border-light); border-radius:var(--radius-sm); overflow:hidden;">
+                <button class="btn btn-sm btn-secondary active" id="btn-view-cards"
+                  onclick="App.setRoomViewMode('cards')">Cards</button>
+                <button class="btn btn-sm btn-secondary" id="btn-view-table"
+                  onclick="App.setRoomViewMode('table')">Table</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:20px;">
+            <div class="filter-bar">
+              <div class="search-input-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="room-dir-search" class="form-input"
+                  placeholder="Search by room name, identifier, or equipment...">
+              </div>
+
+              <div style="min-width: 140px;">
+                <select id="room-dir-floor" class="form-select">
+                  <option value="">All Floors</option>
+                  <option value="1">Floor 1</option>
+                  <option value="2">Floor 2</option>
+                </select>
+              </div>
+
+              <div style="min-width: 150px;">
+                <select id="room-dir-capacity" class="form-select">
+                  <option value="0">Any Capacity</option>
+                  <option value="6">6+ seats</option>
+                  <option value="10">10+ seats</option>
+                  <option value="15">15+ seats</option>
+                  <option value="20">20+ seats</option>
+                </select>
+              </div>
+
+              <label style="display:flex; align-items:center; gap:6px; font-size:0.8rem; cursor:pointer;">
+                <input type="checkbox" id="room-dir-available-only">
+                <span>Available Now</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Cards View -->
+          <div class="card" id="room-cards-container-wrap">
+            <div class="room-cards-grid" id="room-directory-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Table View -->
+          <div class="card" id="room-table-container-wrap" style="display:none;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Room ID</th>
+                    <th>Name</th>
+                    <th>Floor</th>
+                    <th>Capacity</th>
+                    <th>Amenities</th>
+                    <th>Status</th>
+                    <th>Today's Bookings</th>
+                    <th style="text-align:right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="room-directory-tbody">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- VIEW 4: SCHEDULE & TIMELINE -->
+        <!-- ========================================================================= -->
+        <section class="app-view" id="view-schedule">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Workplace Schedule</h1>
+              <p>Visual timeline of daily reservations across all meeting suites</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-primary" data-open-booking>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Book Slot</span>
+              </button>
+            </div>
           </div>
 
           <div class="card">
-            <div class="panel-header">
-              <h3>Optimized Schedule Output</h3>
-              <span class="badge badge-teal" id="greedy-metric-badge">0 Selected</span>
+            <div class="schedule-controls">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-weight:700; font-size:0.9rem;">Date: <span
+                    id="schedule-system-date">Today</span></span>
+                <span class="badge badge-neutral">Operating Hours: 08:00 – 18:00</span>
+              </div>
+
+              <!-- Time Lookup Bar -->
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:0.8rem; color:var(--text-muted); font-weight:500;">Jump to Slot:</span>
+                <select id="schedule-lookup-room" class="form-select" style="width:160px;"></select>
+                <input type="time" id="schedule-lookup-time" value="11:00" class="form-input" style="width:105px;">
+                <button type="button" id="btn-run-schedule-lookup" class="btn btn-secondary btn-sm"
+                  onclick="Calendar.runSlotLookup()">Find Booking</button>
+              </div>
             </div>
-            <div id="greedy-output-container" class="algo-output-box">
-              <div class="empty-state">Run greedy optimizer to inspect accepted and rejected intervals.</div>
+
+            <!-- Slot Result Banner -->
+            <div id="schedule-lookup-banner" class="ops-alert info" style="display:none; margin:16px 20px 0;">
+              <div id="schedule-lookup-text"></div>
+            </div>
+
+            <!-- Timeline Grid -->
+            <div class="timeline-outer" style="margin-top:16px;">
+              <div class="timeline-header-row">
+                <div class="timeline-room-header">Suite / Room</div>
+                <div class="timeline-hours-bar">
+                  <div class="timeline-hour-mark">08:00</div>
+                  <div class="timeline-hour-mark">09:00</div>
+                  <div class="timeline-hour-mark">10:00</div>
+                  <div class="timeline-hour-mark">11:00</div>
+                  <div class="timeline-hour-mark">12:00</div>
+                  <div class="timeline-hour-mark">13:00</div>
+                  <div class="timeline-hour-mark">14:00</div>
+                  <div class="timeline-hour-mark">15:00</div>
+                  <div class="timeline-hour-mark">16:00</div>
+                  <div class="timeline-hour-mark">17:00</div>
+                </div>
+              </div>
+              <div id="schedule-timeline-rows">
+                <!-- Dynamically populated -->
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <!-- Subtab 2: Weighted Interval Scheduling (DP) -->
-      <div class="algo-subpanel" id="subpanel-weighted">
-        <div class="algo-description-box">
-          <div class="algo-desc-content">
-            <h4>Weighted Interval Dynamic Programming Optimizer</h4>
-            <p>Maximizes total strategic business weight: <code>OPT(j) = max(w_j + OPT(p(j)), OPT(j-1))</code> using precomputed compatibility indices.</p>
-          </div>
-          <button id="btn-run-weighted" class="btn btn-primary">Compute Optimal DP Set</button>
-        </div>
-
-        <div class="algo-results-grid">
-          <div class="card">
-            <div class="panel-header">
-              <h3>Candidate Strategic Requests</h3>
-              <span class="badge badge-neutral">4 Candidates</span>
+        <!-- ========================================================================= -->
+        <!-- VIEW 5: RESOURCE ALLOCATION -->
+        <!-- ========================================================================= -->
+        <section class="app-view" id="view-allocation">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Resource Allocation & Optimization</h1>
+              <p>Manage competing meeting requests, dispatch priority queues, and optimize room assignments</p>
             </div>
-            <div class="candidate-list" id="weighted-candidate-list"></div>
-          </div>
-
-          <div class="card">
-            <div class="panel-header">
-              <h3>DP Recurrence & Selected Subset</h3>
-              <span class="badge badge-amber" id="weighted-metric-badge">Score: --</span>
-            </div>
-            <div id="weighted-output-container" class="algo-output-box">
-              <div class="empty-state">Run DP optimizer to inspect predecessor indices, recurrence values, and selected set.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Subtab 3: Bipartite Matching -->
-      <div class="algo-subpanel" id="subpanel-matching">
-        <div class="algo-description-box">
-          <div class="algo-desc-content">
-            <h4>Bipartite Room Allocation Graph</h4>
-            <p>Finds maximum-cardinality matching between meeting requests and suites using augmenting-path DFS traversal.</p>
-          </div>
-          <button id="btn-run-matching" class="btn btn-primary">Run Augmenting Path Matching</button>
-        </div>
-
-        <div class="algo-results-grid">
-          <div class="card">
-            <div class="panel-header">
-              <h3>Request-to-Room Compatibility Matrix</h3>
-              <span class="badge badge-neutral">3 Requests &bull; 3 Rooms</span>
-            </div>
-            <div id="matching-matrix-container" class="matrix-list"></div>
           </div>
 
           <div class="card">
-            <div class="panel-header">
-              <h3>Matching Allocation Results</h3>
-              <span class="badge badge-violet" id="matching-metric-badge">0 / 3 Assigned</span>
+            <!-- Workflow Navigation Subtabs -->
+            <div class="workflow-tabs">
+              <button type="button" class="workflow-tab-btn active" data-sub="priority" id="wtab-btn-priority"
+                onclick="Algorithms.switchSubtab('priority')">Priority Queue Dispatch</button>
+              <button type="button" class="workflow-tab-btn" data-sub="cardinality" id="wtab-btn-cardinality"
+                onclick="Algorithms.switchSubtab('cardinality')">Schedule Capacity Optimization</button>
+              <button type="button" class="workflow-tab-btn" data-sub="strategic" id="wtab-btn-strategic"
+                onclick="Algorithms.switchSubtab('strategic')">High-Value Strategic Allocation</button>
+              <button type="button" class="workflow-tab-btn" data-sub="matching" id="wtab-btn-matching"
+                onclick="Algorithms.switchSubtab('matching')">Multi-Room Matching</button>
             </div>
-            <div id="matching-output-container" class="algo-output-box">
-              <div class="empty-state">Run augmenting path matching to inspect assignments and unaccommodated requests.</div>
+
+            <!-- Panel 1: Priority Dispatch -->
+            <div class="workflow-panel active" id="wpanel-priority">
+              <div class="workflow-intro-box">
+                <div class="workflow-intro-text">
+                  <h3>Priority Request Dispatcher</h3>
+                  <p>Order and process pending booking requests based on organizational priority and requested time.</p>
+                </div>
+                <button type="button" id="btn-exec-pq-dispatch" class="btn btn-primary"
+                  onclick="Algorithms.executePriorityQueueDispatch()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                  <span>Dispatch Requests</span>
+                </button>
+              </div>
+
+              <div class="split-grid-equal">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Pending Meeting Requests</h3>
+                    <span class="badge badge-neutral" id="alloc-pending-count">0 Requests</span>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="data-table">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Title & Organizer</th>
+                          <th>Time</th>
+                          <th>Cap</th>
+                          <th>Priority</th>
+                        </tr>
+                      </thead>
+                      <tbody id="alloc-pending-tbody">
+                        <!-- Populated -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Processed Dispatch Order</h3>
+                    <span class="badge badge-blue">Ordered Queue</span>
+                  </div>
+                  <div class="card-body" id="alloc-dispatch-results" style="padding:16px;">
+                    <div class="empty-state">
+                      <div class="empty-state-title">No Requests Processed Yet</div>
+                      <div class="empty-state-desc">Click "Dispatch Requests" to sort and assign incoming requests by
+                        priority order.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 2: Capacity Maximizer (Greedy) -->
+            <div class="workflow-panel" id="wpanel-cardinality">
+              <div class="workflow-intro-box">
+                <div class="workflow-intro-text">
+                  <h3>Schedule Capacity Maximizer</h3>
+                  <p>Automatically select the maximum number of compatible meetings to prevent one long meeting from
+                    blocking multiple slots.</p>
+                </div>
+                <button type="button" id="btn-exec-greedy-opt" class="btn btn-primary"
+                  onclick="Algorithms.runGreedySchedule()">
+                  <span>Run Capacity Optimizer</span>
+                </button>
+              </div>
+
+              <div class="split-grid-equal">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Candidate Requests</h3>
+                    <span class="badge badge-neutral" id="alloc-greedy-count">4 Candidates</span>
+                  </div>
+                  <div class="card-body" id="alloc-greedy-candidates" style="padding:16px;"></div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Optimized Schedule Plan</h3>
+                    <span class="badge badge-green" id="alloc-greedy-metric">0 Selected</span>
+                  </div>
+                  <div class="card-body" id="alloc-greedy-results" style="padding:16px;">
+                    <div class="empty-state">
+                      <div class="empty-state-title">Awaiting Optimization</div>
+                      <div class="empty-state-desc">Click "Run Capacity Optimizer" to generate the maximum meeting
+                        schedule.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 3: Strategic DP -->
+            <div class="workflow-panel" id="wpanel-strategic">
+              <div class="workflow-intro-box">
+                <div class="workflow-intro-text">
+                  <h3>Strategic Value Maximizer</h3>
+                  <p>Optimize room utilization for high-stakes business meetings with weighted priorities.</p>
+                </div>
+                <button type="button" id="btn-exec-weighted-opt" class="btn btn-primary"
+                  onclick="Algorithms.runWeightedSchedule()">
+                  <span>Calculate Optimal Schedule</span>
+                </button>
+              </div>
+
+              <div class="split-grid-equal">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Strategic Candidates</h3>
+                    <span class="badge badge-neutral" id="alloc-weighted-count">5 Candidates</span>
+                  </div>
+                  <div class="card-body" id="alloc-weighted-candidates" style="padding:16px;"></div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Optimal Business Value Set</h3>
+                    <span class="badge badge-amber" id="alloc-weighted-metric">Score: --</span>
+                  </div>
+                  <div class="card-body" id="alloc-weighted-results" style="padding:16px;">
+                    <div class="empty-state">
+                      <div class="empty-state-title">Awaiting Calculation</div>
+                      <div class="empty-state-desc">Click "Calculate Optimal Schedule" to compute the highest total
+                        value meeting selection.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 4: Multi-Room Matching -->
+            <div class="workflow-panel" id="wpanel-matching">
+              <div class="workflow-intro-box">
+                <div class="workflow-intro-text">
+                  <h3>Multi-Room Assignment Engine</h3>
+                  <p>Assign meeting requests to available rooms considering capacity and equipment requirements.</p>
+                </div>
+                <button type="button" id="btn-exec-matching-opt" class="btn btn-primary"
+                  onclick="Algorithms.runBipartiteMatching()">
+                  <span>Match Requests to Rooms</span>
+                </button>
+              </div>
+
+              <div class="split-grid-equal">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Pending Requests & Eligible Suites</h3>
+                    <span class="badge badge-neutral">3 Requests &bull; 3 Rooms</span>
+                  </div>
+                  <div class="card-body" id="alloc-matching-matrix" style="padding:16px;"></div>
+                </div>
+
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Room Assignment Results</h3>
+                    <span class="badge badge-purple" id="alloc-matching-metric">0 / 3 Assigned</span>
+                  </div>
+                  <div class="card-body" id="alloc-matching-results" style="padding:16px;">
+                    <div class="empty-state">
+                      <div class="empty-state-title">Awaiting Assignment</div>
+                      <div class="empty-state-desc">Click "Match Requests to Rooms" to solve the optimal suite
+                        allocation.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- VIEW 6: OPERATIONS & AUDIT -->
+        <!-- ========================================================================= -->
+        <section class="app-view" id="view-operations">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Operations & Conflict Audit</h1>
+              <p>Investigate schedule overlaps, inspect time collisions, and monitor workspace operations</p>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- Tab 5: Conflict Inspector (Interval Tree) -->
-    <section class="tab-content" id="view-conflicts">
-      <div class="section-toolbar">
-        <div class="toolbar-left">
-          <h2 class="section-title">Interval Tree Conflict Inspector</h2>
-          <span class="section-desc">Augmented subtree max-end overlap query engine for instant clash detection</span>
-        </div>
-      </div>
+          <div class="card" style="margin-bottom:24px;">
+            <div class="card-header">
+              <h2 class="card-title">Schedule Conflict Inspector</h2>
+              <span class="card-subtitle">Check proposed meeting windows against confirmed reservations</span>
+            </div>
+            <div class="card-body">
+              <div class="form-grid" style="align-items:flex-end;">
+                <div class="form-group">
+                  <label class="form-label" for="audit-room-select">Meeting Suite</label>
+                  <select id="audit-room-select" class="form-select"></select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="audit-start-time">Proposed Start Time</label>
+                  <input type="time" id="audit-start-time" value="10:00" class="form-input">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="audit-end-time">Proposed End Time</label>
+                  <input type="time" id="audit-end-time" value="16:00" class="form-input">
+                </div>
+                <div class="form-group">
+                  <button type="button" id="btn-audit-check-conflicts" class="btn btn-primary" style="height:36px;"
+                    onclick="Algorithms.queryIntervalConflicts()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <span>Check Overlaps</span>
+                  </button>
+                </div>
+              </div>
 
-      <div class="card conflict-query-card">
-        <div class="conflict-form">
-          <div class="form-group">
-            <label for="conflict-room-select">Room Suite</label>
-            <select id="conflict-room-select" class="input-select"></select>
+              <div id="audit-conflict-results" style="margin-top:20px;">
+                <div class="empty-state">
+                  <div class="empty-state-title">Select a room and time range</div>
+                  <div class="empty-state-desc">Query the reservation index to verify whether any meetings conflict with
+                    the requested window.</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="conflict-start-time">Proposed Start Time</label>
-            <input type="time" id="conflict-start-time" value="10:00" class="input-time">
-          </div>
-          <div class="form-group">
-            <label for="conflict-end-time">Proposed End Time</label>
-            <input type="time" id="conflict-end-time" value="16:00" class="input-time">
-          </div>
-          <div class="form-group form-actions">
-            <button id="btn-query-conflicts" class="btn btn-primary">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <span>Query Interval Tree</span>
-            </button>
-          </div>
-        </div>
-      </div>
 
-      <div class="conflict-results-container" id="conflict-results-box">
-        <div class="empty-state">Select a room and time range to query the interval tree for overlapping bookings.</div>
-      </div>
-    </section>
-  </main>
+          <!-- Audit Activity Log -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Recent Operational Events & Audits</h2>
+              <span class="badge badge-neutral">System Log</span>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Severity</th>
+                  </tr>
+                </thead>
+                <tbody id="ops-audit-log-body">
+                  <tr>
+                    <td>10:00:00</td>
+                    <td><span class="badge badge-neutral">Occupancy</span></td>
+                    <td>Automatic occupancy check executed across all 8 rooms.</td>
+                    <td><span class="badge badge-green">Normal</span></td>
+                  </tr>
+                  <tr>
+                    <td>09:00:00</td>
+                    <td><span class="badge badge-blue">Check-in</span></td>
+                    <td>Elena Rostova checked into Ada Lovelace Boardroom for Executive Strategy Briefing.</td>
+                    <td><span class="badge badge-green">Normal</span></td>
+                  </tr>
+                  <tr>
+                    <td>08:30:00</td>
+                    <td><span class="badge badge-amber">Capacity</span></td>
+                    <td>Daily booking schedule loaded with 10 confirmed sessions.</td>
+                    <td><span class="badge badge-blue">Info</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
 
-  <!-- Room Details Drawer Modal -->
-  <div class="modal-backdrop hidden" id="room-modal-backdrop">
-    <div class="modal-card" id="room-modal-card">
-      <div class="modal-header">
-        <div class="modal-title-wrap">
-          <span class="room-chip" id="modal-room-chip">ROOM-101</span>
-          <h3 id="modal-room-name">Suite Name</h3>
-        </div>
-        <button class="btn-close-modal" id="btn-close-room-modal" aria-label="Close Modal">&times;</button>
       </div>
-      <div class="modal-body">
-        <div class="modal-specs">
-          <div class="spec-pill"><span class="spec-label">Capacity:</span> <strong id="modal-room-capacity">12</strong> seats</div>
-          <div class="spec-pill"><span class="spec-label">Floor:</span> <strong id="modal-room-floor">Floor 1</strong></div>
-          <div class="spec-pill"><span class="spec-label">Status:</span> <strong id="modal-room-status">Available</strong></div>
-        </div>
-        <div class="modal-amenities-wrap">
-          <h4>Amenities & Equipment</h4>
-          <div class="tags-row" id="modal-room-amenities"></div>
-        </div>
-        <div class="modal-bookings-wrap">
-          <h4>Today's Schedule</h4>
-          <div class="schedule-timeline-mini" id="modal-room-schedule"></div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary" id="btn-modal-quick-book">Book This Suite</button>
-      </div>
-    </div>
+    </main>
   </div>
 
-  <!-- Create Reservation Modal -->
-  <div class="modal-backdrop hidden" id="booking-modal-backdrop">
-    <div class="modal-card" id="booking-modal-card">
+  <!-- ========================================================================= -->
+  <!-- MODAL: BOOK A ROOM -->
+  <!-- ========================================================================= -->
+  <div class="modal-overlay hidden" id="booking-modal-backdrop">
+    <div class="modal-container">
       <div class="modal-header">
-        <h3>Create Workplace Reservation</h3>
-        <button class="btn-close-modal" id="btn-close-booking-modal" aria-label="Close">&times;</button>
+        <h2 class="modal-title">Book a Workplace Room</h2>
+        <button class="modal-close" id="btn-close-booking-modal" aria-label="Close dialog">&times;</button>
       </div>
       <form id="form-create-reservation">
-        <div class="modal-body form-grid">
-          <div class="form-group full-width">
-            <label for="book-title">Meeting Title *</label>
-            <input type="text" id="book-title" required placeholder="e.g. Q4 Executive Planning" class="input-text">
-          </div>
-          <div class="form-group">
-            <label for="book-organizer">Organizer *</label>
-            <input type="text" id="book-organizer" required placeholder="Your Name" class="input-text">
-          </div>
-          <div class="form-group">
-            <label for="book-room">Target Room *</label>
-            <select id="book-room" required class="input-select"></select>
-          </div>
-          <div class="form-group">
-            <label for="book-start">Start Time *</label>
-            <input type="time" id="book-start" required value="10:00" class="input-time">
-          </div>
-          <div class="form-group">
-            <label for="book-end">End Time *</label>
-            <input type="time" id="book-end" required value="11:00" class="input-time">
-          </div>
-          <div class="form-group">
-            <label for="book-priority">Priority Level</label>
-            <select id="book-priority" class="input-select">
-              <option value="5">Priority 5 (Executive / VIP)</option>
-              <option value="4">Priority 4 (High Strategic)</option>
-              <option value="3" selected>Priority 3 (Standard Sync)</option>
-              <option value="2">Priority 2 (Low / Flexible)</option>
-              <option value="1">Priority 1 (Informal)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="book-date">Date</label>
-            <input type="date" id="book-date" value="2026-10-24" class="input-text" readonly>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label" for="book-title">Meeting Title *</label>
+              <input type="text" id="book-title" class="form-input" required placeholder="e.g. Q4 Executive Planning">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="book-organizer">Organizer *</label>
+              <input type="text" id="book-organizer" class="form-input" required placeholder="Your Name">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="book-room">Target Room *</label>
+              <select id="book-room" class="form-select" required></select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="book-start">Start Time *</label>
+              <input type="time" id="book-start" class="form-input" required value="10:00">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="book-end">End Time *</label>
+              <input type="time" id="book-end" class="form-input" required value="11:00">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="book-priority">Priority Level</label>
+              <select id="book-priority" class="form-select">
+                <option value="5">Priority 5 (Executive / VIP)</option>
+                <option value="4">Priority 4 (High Strategic)</option>
+                <option value="3" selected>Priority 3 (Standard Sync)</option>
+                <option value="2">Priority 2 (Flexible / Low)</option>
+                <option value="1">Priority 1 (Informal)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="book-date">Date</label>
+              <input type="date" id="book-date" class="form-input" value="2026-10-24" readonly>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -525,13 +887,35 @@
     </div>
   </div>
 
-  <!-- Toast Container -->
-  <div class="toast-container" id="toast-container"></div>
+  <!-- ========================================================================= -->
+  <!-- DRAWER: RESERVATION / ROOM DETAILS -->
+  <!-- ========================================================================= -->
+  <div class="drawer-overlay hidden" id="details-drawer-overlay">
+    <div class="drawer-card">
+      <div class="drawer-header">
+        <div>
+          <span class="badge badge-blue" id="drawer-badge">Details</span>
+          <h2 class="modal-title" id="drawer-title" style="margin-top:4px;">Inspection</h2>
+        </div>
+        <button class="modal-close" id="btn-close-drawer" aria-label="Close drawer">&times;</button>
+      </div>
+      <div class="drawer-body" id="drawer-body-content">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="drawer-footer" id="drawer-footer-actions">
+        <!-- Action buttons like Cancel Reservation or Quick Book -->
+      </div>
+    </div>
+  </div>
 
-  <!-- Scripts -->
+  <!-- Toast Container -->
+  <div class="toast-shelf" id="toast-container"></div>
+
+  <!-- Core Scripts -->
   <script src="/static/js/floorplan.js"></script>
   <script src="/static/js/calendar.js"></script>
   <script src="/static/js/algorithms.js"></script>
   <script src="/static/js/app.js"></script>
 </body>
+
 </html>

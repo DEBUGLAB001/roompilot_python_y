@@ -205,7 +205,7 @@ def cancel_reservation(res_id):
 @api_bp.route("/requests", methods=["GET"])
 def get_requests():
     conn = get_db()
-    rows = conn.execute("SELECT * FROM meeting_requests ORDER BY priority DESC, start_time").fetchall()
+    rows = conn.execute("SELECT * FROM meeting_requests WHERE status = 'pending'").fetchall()
     conn.close()
     return jsonify([dict(r) for r in rows]), 200
 
@@ -308,13 +308,11 @@ def greedy_schedule():
     candidates = data.get("candidates")
 
     if candidates is None:
-        # Default candidate dataset for greedy scheduling
         candidates = [
-            {"id": "REQ-G1", "title": "All-Day Architecture Bootcamp", "start_time": "08:30", "end_time": "17:00", "priority": 3},
-            {"id": "REQ-G2", "title": "Morning Standup", "start_time": "09:00", "end_time": "10:00", "priority": 4},
-            {"id": "REQ-G3", "title": "Design System Review", "start_time": "10:30", "end_time": "12:00", "priority": 3},
-            {"id": "REQ-G4", "title": "Client Roadmap Demo", "start_time": "13:00", "end_time": "14:30", "priority": 5},
-            {"id": "REQ-G5", "title": "Sprint Retrospective", "start_time": "15:00", "end_time": "16:30", "priority": 4},
+            {"id": "RES-A", "title": "Executive Planning Workshop", "start_time": "09:00", "end_time": "12:00", "priority": 4},
+            {"id": "RES-B", "title": "Morning Standup", "start_time": "09:30", "end_time": "10:30", "priority": 3},
+            {"id": "RES-C", "title": "Design System Sync", "start_time": "10:30", "end_time": "11:30", "priority": 3},
+            {"id": "RES-D", "title": "Product Architecture Review", "start_time": "11:30", "end_time": "12:30", "priority": 4},
         ]
 
     result = schedule_greedy_earliest_finish(candidates)
@@ -330,12 +328,12 @@ def weighted_schedule():
     candidates = data.get("candidates")
 
     if candidates is None:
-        # Default candidate dataset for weighted DP
         candidates = [
-            {"id": "W-REQ-1", "title": "Morning Strategy Kickoff", "start_time": "09:00", "end_time": "10:00", "weight": 15},
-            {"id": "W-REQ-2", "title": "Executive Investor Pitch", "start_time": "10:00", "end_time": "11:30", "weight": 25},
-            {"id": "W-REQ-3", "title": "Conflicting Cross-Team Sync", "start_time": "09:30", "end_time": "10:45", "weight": 30},
-            {"id": "W-REQ-4", "title": "Afternoon Tech Deep Dive", "start_time": "11:30", "end_time": "13:00", "weight": 20},
+            {"id": "REQ-01", "title": "Morning Strategy Kickoff", "start_time": "09:00", "end_time": "10:00", "weight": 20},
+            {"id": "REQ-02", "title": "Executive Investor Pitch", "start_time": "09:30", "end_time": "11:00", "weight": 35},
+            {"id": "REQ-03", "title": "Conflicting Cross-Team Sync", "start_time": "10:00", "end_time": "11:30", "weight": 15},
+            {"id": "REQ-04", "title": "Product Architecture Review", "start_time": "11:00", "end_time": "12:30", "weight": 25},
+            {"id": "REQ-05", "title": "Leadership Retrospective", "start_time": "11:30", "end_time": "13:00", "weight": 40},
         ]
 
     result = solve_weighted_interval_scheduling(candidates)

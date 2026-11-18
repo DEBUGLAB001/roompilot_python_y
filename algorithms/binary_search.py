@@ -13,6 +13,8 @@ def find_predecessor_booking(sorted_reservations, target_time):
         if mid_start < target_time:
             result_idx = mid
             low = mid + 1
+        elif mid_start == target_time:
+            return mid
         else:
             high = mid - 1
 

@@ -38,14 +38,11 @@ class IntervalTree:
 
         if new_node.start < current.start:
             current.left = self._insert_node(current.left, new_node)
+            current.max_end = max(current.end, current.left.max_end)
         else:
             current.right = self._insert_node(current.right, new_node)
+            current.max_end = max(current.end, current.right.max_end)
 
-        current.max_end = max(
-            current.end,
-            current.left.max_end if current.left else "",
-            current.right.max_end if current.right else ""
-        )
         return current
 
     def query_overlapping(self, q_start, q_end):
@@ -60,7 +57,7 @@ class IntervalTree:
         if node.start < q_end and node.end > q_start:
             results.append(node.data)
 
-        if node.left and node.left.max_end >= q_end:
+        if node.left and node.left.max_end > q_start:
             self._search(node.left, q_start, q_end, results)
 
         if node.right and node.start < q_end:
